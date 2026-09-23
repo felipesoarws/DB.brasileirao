@@ -1,3 +1,7 @@
 .mark{background:transparent;border-radius:0}
 .mark img{display:block;width:28px;height:28px;object-fit:contain}
 .status{line-height:16px}
+.sidebar .brand>span,.drawer .brand>span{display:grid;gap:0;line-height:1}
+.sidebar .brand b,.drawer .brand b{line-height:14px}
+.sidebar .brand small,.drawer .brand small{margin-top:-1px;line-height:12px}
+.social .ico svg{display:block;width:15px;height:15px;fill:currentColor}
