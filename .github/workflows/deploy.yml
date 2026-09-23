@@ -90,6 +90,7 @@ jobs:
       - name: Build with downloaded Gold data
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DATA_ROOT: ./data
         run: npx --yes vercel@59.25.4 build --prod --token="$VERCEL_TOKEN"
 
       - name: Deploy prebuilt production output
