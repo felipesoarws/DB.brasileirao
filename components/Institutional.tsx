@@ -1,0 +1,1 @@
+import {ReactNode} from 'react';import {Header} from './ui';export default function Institutional({title,desc,children}:{title:string,desc:string,children:ReactNode}){return <><Header title={title} desc={desc}/><article style={{maxWidth:760}}>{children}</article></>}

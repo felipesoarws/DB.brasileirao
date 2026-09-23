@@ -1,0 +1,10 @@
+# Keep local datasets out of Git
+bronze/**
+silver/**
+gold/**
+
+!bronze/.gitkeep
+!silver/.gitkeep
+!gold/.gitkeep
+!README.md
+!.gitignore

@@ -1,0 +1,1 @@
+module.exports = { content: ['./pages/**/*.{ts,tsx}','./components/**/*.{ts,tsx}'], theme:{extend:{colors:{brand:'#087A46','brand-hover':'#06663B',border:'#ececec','text-muted':'#737373'}}}, plugins:[] };
