@@ -1,8 +1,10 @@
-.standings-table table{min-width:920px}
+.standings-table table{width:100%;min-width:920px;table-layout:fixed}
 .standings-table th,.standings-table td{white-space:nowrap}
 .standings-table th:nth-child(3),.standings-table td:nth-child(3){text-align:center}
 .form-results{display:flex;align-items:center;justify-content:center;gap:4px}
 .form-result{display:inline-flex;width:21px;height:21px;align-items:center;justify-content:center;border-radius:4px;font-size:11px;line-height:1;font-weight:600}
+.form-results a.form-result{text-decoration:none}
+.form-results a.form-result:focus-visible{outline:2px solid #087a46;outline-offset:2px}
 .form-v{color:#166534;background:#dcfce7}
 .form-e{color:#854d0e;background:#fef3c7}
 .form-d{color:#991b1b;background:#fee2e2}
@@ -33,3 +35,68 @@
 .match-section-heading{display:flex;justify-content:space-between;align-items:center}
 @media(max-width:680px){.section-heading-row{align-items:center;flex-direction:row}.section-heading-row>.btn{align-self:center}}
 @media(max-width:520px){.match-section-heading{align-items:center;flex-direction:row}.match-section-heading>.btn{align-self:center}}
+
+.home-standings-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:12px}
+.home-standings-heading h2{margin:0 0 2px}
+.home-standings-controls{display:flex;align-items:center;gap:10px;flex:none}
+.season-statistics>.kpis{margin-top:16px}
+.season-stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.season-stat-card{display:grid;gap:12px;padding:14px 16px}
+.season-stat-card>div:first-child{display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:12px}
+.season-stat-card>div:first-child>span{color:#087a46;font-weight:650;white-space:nowrap}
+.season-stat-card small{color:var(--muted);font-size:10px;font-weight:500}
+.season-stat-track{height:6px;overflow:hidden;border-radius:999px;background:#f0f1f2}
+.season-stat-track>span{height:100%;display:block;border-radius:inherit;background:#087a46;transition:width 180ms ease}
+.season-leader-card{min-width:0}
+.season-leader-card h2{margin:0 0 12px;font-size:16px}
+.season-leader-table table{min-width:520px;table-layout:fixed}
+.season-leader-table col:nth-child(1){width:8%}
+.season-leader-table col:nth-child(2){width:34%}
+.season-leader-table col:nth-child(3){width:42%}
+.season-leader-table col:nth-child(4){width:16%}
+.season-leader-table td:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.season-leader-table td:nth-child(3)>.team{width:100%}
+@media(max-width:900px){.home-standings-heading{align-items:flex-start;flex-wrap:wrap}.home-standings-controls{margin-left:auto}}
+@media(max-width:680px){.home-standings-heading{align-items:flex-start;flex-direction:column}.home-standings-controls{width:100%;justify-content:space-between;margin:0}.season-stat-grid{grid-template-columns:1fr}}
+
+.statistics-panel.card{padding:20px}
+.statistics-section-heading{display:flex;align-items:flex-start;gap:11px;margin-bottom:16px}
+.statistics-section-heading h2{margin:0 0 2px;font-size:17px;line-height:23px}
+.statistics-section-heading .caption{margin:0}
+.statistics-section-icon{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;flex:none;border-radius:9px;background:#edf7f1;color:#087a46;font-size:16px;font-weight:650}
+.season-statistics .kpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+.season-statistics .kpi+.kpi{border-left:1px solid var(--border)}
+.season-statistics .kpi{min-width:0;padding:15px 16px}
+.season-statistics .kpi label{display:block;min-height:30px}
+.season-statistics .kpi strong{font-size:22px}
+.season-statistics .kpi:nth-child(3),.season-statistics .kpi:nth-child(4){border-top:0}
+.round-goals-grid{height:235px;display:grid;grid-template-columns:repeat(28,minmax(0,1fr));align-items:stretch;gap:6px;padding:12px 4px 0;border-bottom:1px solid var(--border)}
+.round-goal-item{min-width:0;display:grid;grid-template-rows:15px minmax(0,1fr) 16px 15px;justify-items:center;align-items:end;gap:3px}
+.round-goal-value{color:#525252;font-size:10px;line-height:14px}
+.round-goal-track{width:min(24px,78%);height:100%;display:flex;align-items:flex-end;justify-content:center}
+.round-goal-track>span{width:100%;min-height:3px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#16a05d,#087a46);transition:height 180ms ease}
+.round-goal-label{color:var(--muted);font-size:10px;line-height:14px;white-space:nowrap}
+.round-goal-average{color:#087a46;font-size:9px;line-height:13px;white-space:nowrap}
+.round-goal-average small{color:var(--muted);font-size:8px}
+.club-performance-table table{min-width:980px;table-layout:fixed}
+.club-performance-table col:nth-child(1){width:5%}.club-performance-table col:nth-child(2){width:22%}.club-performance-table col:nth-child(3){width:9%}.club-performance-table col:nth-child(4){width:10%}.club-performance-table col:nth-child(5){width:12%}.club-performance-table col:nth-child(6){width:12%}.club-performance-table col:nth-child(7){width:15%}.club-performance-table col:nth-child(8){width:15%}
+.club-performance-table .team{width:100%}
+.club-home-away{white-space:nowrap}
+.club-home-away small{color:var(--muted);font-size:10px}
+.club-home-away>span{padding:0 5px;color:#b5b5b5}
+.club-match-statistics{padding:0;overflow:hidden}
+.club-statistics-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 16px;border-bottom:1px solid var(--border);background:#fcfcfc}
+.club-statistics-toolbar h3{margin:0;font-size:13px;line-height:20px;font-weight:600}
+.club-statistics-toolbar p{margin:2px 0 0}
+.club-statistics-toolbar label{display:grid;gap:4px;flex:none;color:var(--muted);font-size:10px}
+.club-statistics-toolbar select{min-width:220px;height:34px;padding:0 30px 0 10px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:var(--text);font-size:11px}
+.club-match-stat-table{border:0;border-radius:0}
+.club-match-stat-table table{min-width:820px;table-layout:fixed}
+.club-match-stat-table col:nth-child(1){width:5%}.club-match-stat-table col:nth-child(2){width:22%}.club-match-stat-table col:nth-child(3){width:27%}.club-match-stat-table col:nth-child(4){width:14%}.club-match-stat-table col:nth-child(5){width:17%}.club-match-stat-table col:nth-child(6){width:15%}
+.club-match-stat-table .team{width:100%}
+.club-stat-average{display:flex;align-items:center;gap:10px}
+.club-stat-average>strong{min-width:48px;color:#087a46;font-variant-numeric:tabular-nums}
+.club-stat-track{height:6px;flex:1;overflow:hidden;border-radius:999px;background:#eff1ef}
+.club-stat-track i{height:100%;display:block;border-radius:inherit;background:#149456}
+@media(max-width:1100px){.season-statistics .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.season-statistics .kpi:nth-child(4){border-left:0;border-top:1px solid var(--border)}.season-statistics .kpi:nth-child(5){border-top:1px solid var(--border)}}
+@media(max-width:680px){.statistics-panel.card{padding:15px}.season-statistics .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.season-statistics .kpi:nth-child(3),.season-statistics .kpi:nth-child(4),.season-statistics .kpi:nth-child(5){border-top:1px solid var(--border)}.season-statistics .kpi:nth-child(3),.season-statistics .kpi:nth-child(5){border-left:0}.season-statistics .kpi:nth-child(4){border-left:1px solid var(--border)}.round-goals-grid{height:auto;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px 7px;padding:10px 2px 0}.round-goal-item{height:112px}.round-goal-track{width:min(24px,75%)}.round-goal-label{font-size:9px}.club-statistics-toolbar{align-items:stretch;flex-direction:column}.club-statistics-toolbar label{width:100%}.club-statistics-toolbar select{width:100%;min-width:0}}

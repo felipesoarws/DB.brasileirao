@@ -20,10 +20,10 @@ export const seasonMatches = (s:string) => {
 
 export const standings = (s:string) => {
   const clubs=teamsMap();
-  type FormResult={result:string;home:string;away:string;homeId:string;awayId:string;score:string;round:number|string|null};
+  type FormResult={result:string;home:string;away:string;homeId:string;awayId:string;score:string;round:number|string|null;matchId:string};
   const formByTeam=new Map<string,FormResult[]>();
   const formMatches=seasonMatches(s).filter(m=>isFinished(m)&&m.home_score!=null&&m.away_score!=null).sort((a,b)=>Date.parse(a.kickoff_utc||a.kickoff_date||'')-Date.parse(b.kickoff_utc||b.kickoff_date||''));
-  const addForm=(id:string,result:string,m:Row,home:number,away:number)=>{const homeTeam=clubs.get(String(m.canonical_home_team_id)),awayTeam=clubs.get(String(m.canonical_away_team_id));const form=formByTeam.get(id)||[];form.push({result,home:m.canonical_home_team_name||homeTeam?.canonical_team_name||homeTeam?.name||'Mandante',away:m.canonical_away_team_name||awayTeam?.canonical_team_name||awayTeam?.name||'Visitante',homeId:String(m.canonical_home_team_id),awayId:String(m.canonical_away_team_id),score:`${home}–${away}`,round:m.round??null});formByTeam.set(id,form);};
+  const addForm=(id:string,result:string,m:Row,home:number,away:number)=>{const homeTeam=clubs.get(String(m.canonical_home_team_id)),awayTeam=clubs.get(String(m.canonical_away_team_id));const form=formByTeam.get(id)||[];form.push({result,home:m.canonical_home_team_name||homeTeam?.canonical_team_name||homeTeam?.name||'Mandante',away:m.canonical_away_team_name||awayTeam?.canonical_team_name||awayTeam?.name||'Visitante',homeId:String(m.canonical_home_team_id),awayId:String(m.canonical_away_team_id),score:`${home}–${away}`,round:m.round??null,matchId:String(m.canonical_match_id)});formByTeam.set(id,form);};
   for(const m of formMatches){
     const home=Number(m.home_score),away=Number(m.away_score);
     addForm(String(m.canonical_home_team_id),home>away?'V':home<away?'D':'E',m,home,away);
@@ -54,6 +54,70 @@ export const standings = (s:string) => {
     .map((r,i)=>({...r,position:i+1}));
 };
 
+export const venueStandings = (s:string,venue:'home'|'away',baseRows:Row[]=standings(s)) => {
+  const clubs=teamsMap();
+  const rows=new Map<string,Row>();
+  const forms=new Map<string,Array<{result:string;home:string;away:string;homeId:string;awayId:string;score:string;round:number|string|null;matchId:string}>>();
+  for(const row of baseRows){
+    const id=String(row.canonical_team_id||row.team_id);
+    rows.set(id,{...row,position:0,played:0,wins:0,draws:0,losses:0,goals_for:0,goals_against:0,goal_difference:0,points:0,form:[]});
+  }
+  const playedMatches=seasonMatches(s)
+    .filter(m=>isFinished(m)&&m.home_score!=null&&m.away_score!=null)
+    .sort((a,b)=>Date.parse(a.kickoff_utc||a.kickoff_date||'')-Date.parse(b.kickoff_utc||b.kickoff_date||''));
+  for(const match of playedMatches){
+    const homeId=String(match.canonical_home_team_id),awayId=String(match.canonical_away_team_id);
+    const teamId=venue==='home'?homeId:awayId;
+    const team=clubs.get(teamId);
+    const row=rows.get(teamId)||{canonical_team_id:teamId,team_name:team?.canonical_team_name??team?.name??null,team:team??null};
+    const homeGoals=Number(match.home_score),awayGoals=Number(match.away_score);
+    const goalsFor=venue==='home'?homeGoals:awayGoals,goalsAgainst=venue==='home'?awayGoals:homeGoals;
+    row.played=(row.played||0)+1;
+    row.goals_for=(row.goals_for||0)+goalsFor;
+    row.goals_against=(row.goals_against||0)+goalsAgainst;
+    if(goalsFor>goalsAgainst){row.wins=(row.wins||0)+1;row.points=(row.points||0)+3;}
+    else if(goalsFor<goalsAgainst)row.losses=(row.losses||0)+1;
+    else{row.draws=(row.draws||0)+1;row.points=(row.points||0)+1;}
+    row.goal_difference=row.goals_for-row.goals_against;
+    rows.set(teamId,row);
+    const results=forms.get(teamId)||[];
+    results.push({result:goalsFor>goalsAgainst?'V':goalsFor<goalsAgainst?'D':'E',home:match.canonical_home_team_name||'Mandante',away:match.canonical_away_team_name||'Visitante',homeId,awayId,score:`${homeGoals}–${awayGoals}`,round:match.round??null,matchId:String(match.canonical_match_id)});
+    forms.set(teamId,results);
+  }
+  const ranked:Row[]=[...rows.entries()].map(([id,row])=>({...row,form:(forms.get(id)||[]).slice(-5).reverse()}));
+  return ranked
+    .sort((a,b)=>b.points-a.points||b.goal_difference-a.goal_difference||b.goals_for-a.goals_for||String(a.team_name||'').localeCompare(String(b.team_name||'')))
+    .map((row,index)=>({...row,position:index+1}));
+};
+
+export function seasonAnalytics(s:string){
+  const stats=gold('analytics/season_goal_stats').find(row=>String(row.season)===s)||null;
+  const players=new Map(gold('players').map(player=>[String(player.canonical_player_id),player]));
+  const clubs=teamsMap();
+  const leaders=gold('season_leaders').filter(row=>String(row.season)===s);
+  const roundGoals=gold('analytics/round_goal_stats').filter(row=>String(row.season)===s).sort((a,b)=>Number(a.round)-Number(b.round));
+  const clubPerformance:Row[]=gold('analytics/team_season_stats').filter(row=>String(row.season)===s).map(row=>{
+    const id=String(row.canonical_team_id||row.team_id),club=clubs.get(id);
+    return {...row,canonical_team_id:id,team_name:club?.canonical_team_name||club?.name||id,team:club||null};
+  }).sort((a:Row,b:Row)=>Number(b.points)-Number(a.points)||Number(b.goal_difference)-Number(a.goal_difference)||Number(b.goals_for)-Number(a.goals_for));
+  const clubMatchStats=gold('analytics/team_match_statistics').filter(row=>String(row.season)===s&&row.period==null).map(row=>{
+    const id=String(row.canonical_team_id||row.team_id),club=clubs.get(id);
+    return {...row,canonical_team_id:id,team_name:club?.canonical_team_name||club?.name||id,team:club||null};
+  });
+  const top=(category:string)=>{
+    const unique=new Map<string,Row>();
+    for(const row of leaders){
+      if(row.category!==category||row.player_id==null)continue;
+      const id=String(row.player_id),player=players.get(id),teamId=row.team_id==null?'':String(row.team_id),club=clubs.get(teamId);
+      const candidate={playerId:id,name:String(player?.name||'Jogador'),teamId,teamName:String(club?.canonical_team_name||club?.name||''),teamColor:club?.color||null,value:Number(row.value)||0};
+      const current=unique.get(id);
+      if(!current||candidate.value>current.value)unique.set(id,candidate);
+    }
+    return [...unique.values()].sort((a,b)=>b.value-a.value||a.name.localeCompare(b.name,'pt-BR')).slice(0,10);
+  };
+  return {stats:stats?{matches:Number(stats.matches)||0,homeGoals:Number(stats.home_goals)||0,awayGoals:Number(stats.away_goals)||0,totalGoals:Number(stats.total_goals)||0,goalsPerMatch:Number(stats.goals_per_match)||0,over15:Number(stats.over_1_5)||0,over25:Number(stats.over_2_5)||0,over35:Number(stats.over_3_5)||0,bothScored:Number(stats.both_teams_scored)||0,cleanSheets:Number(stats.clean_sheet_matches)||0}:null,roundGoals,clubPerformance,clubMatchStats,scorers:top('goals'),assists:top('assists')};
+}
+
 export const related = (name:string,id:string) => by(gold(name),'canonical_match_id',id);
 
 export function dashboard() {
@@ -71,6 +135,7 @@ export function dashboard() {
   }).sort((a:Row,b:Row)=>Number(b.season)-Number(a.season));
   const recent=seasonRows.filter(x=>x.t<=now&&isFinished(x.m)).sort((a,b)=>b.t-a.t).slice(0,5).map(x=>x.m);
   const upcoming=seasonRows.filter(x=>(x.t>now||!x.t)&&!isFinished(x.m)).sort((a,b)=>(a.t||Infinity)-(b.t||Infinity)).slice(0,5).map(x=>x.m);
+  const seasonTable=season?standings(season):[];
   return {
     season,
     seasons:[...new Set(ms.map(m=>String(m.season)))].length,
@@ -83,7 +148,9 @@ export function dashboard() {
     recentRound:recent[0]?.round??null,
     upcomingRound:upcoming[0]?.round??null,
     champions,
-    standings:season?standings(season).slice(0,20):[]
+    standings:seasonTable.slice(0,20),
+    standingsHome:season?venueStandings(season,'home',seasonTable).slice(0,20):[],
+    standingsAway:season?venueStandings(season,'away',seasonTable).slice(0,20):[]
   };
 }
 

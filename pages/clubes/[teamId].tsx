@@ -81,9 +81,8 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
     <Head><title>{team.name} — Brasileirão Database</title><meta name="description" content={`Estatísticas e histórico de temporadas de ${team.name} no Brasileirão Série A.`}/><link key="favicon" rel="icon" type="image/png" href={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`}/></Head>
     <div className="club-detail" style={{'--club-color':color} as React.CSSProperties}>
       <header className="club-hero card">
-        <Link className="club-back" href="/clubes" aria-label="Voltar para clubes">‹</Link>
         <img className="club-hero-logo" src={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`} alt={`Escudo do ${team.name}`} onError={event=>{event.currentTarget.style.visibility='hidden'}}/>
-        <div className="club-hero-copy"><h1>{team.name}</h1><p><strong>{stats.seasons}</strong> temporadas no Brasileirão</p>{championYears.length>0&&<p className="club-title-years"><span aria-hidden="true">🏆</span><span>Campeão em <strong>{championYears.join(', ')}</strong></span></p>}</div>
+        <div className="club-hero-copy"><h1>{team.name}</h1><p><strong>{stats.seasons}</strong> {stats.seasons===1?'temporada':'temporadas'} no Brasileirão</p>{championYears.length>0&&<p className="club-title-years"><span aria-hidden="true">🏆</span><span>Campeão em <strong>{championYears.join(', ')}</strong></span></p>}</div>
       </header>
 
       <section className="club-metrics" aria-label="Estatísticas gerais">
@@ -157,7 +156,7 @@ export const getServerSideProps:GetServerSideProps<ClubPageProps>=async({params}
     const played=metric(row.played),won=metric(row.won??row.wins),drawn=metric(row.drawn??row.draws),lost=metric(row.lost??row.losses),gf=metric(row.gf??row.goals_for),ga=metric(row.ga??row.goals_against),points=metric(row.points);
     return {season:metric(row.season),points,played,won,drawn,lost,gf,ga,position:row.position==null?null:metric(row.position),percentage:played?Math.round(points/(played*3)*1000)/10:0};
   }).sort((a,b)=>b.season-a.season);
-  const goalsBySeason:GoalsRow[]=gold('analytics/season_goal_stats').filter(row=>Number(row.matches)>0).map(row=>({season:String(row.season),average:Number(Number(row.goals_per_match).toFixed(2)),games:metric(row.matches)})).sort((a,b)=>a.season.localeCompare(b.season));
+  const goalsBySeason:GoalsRow[]=gold('analytics/team_season_stats').filter(row=>String(row.team_id||row.canonical_team_id)===teamId&&Number(row.played)>0).map(row=>({season:String(row.season),average:Number((metric(row.goals_for)/metric(row.played)).toFixed(2)),games:metric(row.played)})).sort((a,b)=>a.season.localeCompare(b.season));
   const championYears=gold('season_champions').filter(row=>String(row.team_id||row.canonical_team_id)===teamId).map(row=>String(row.season)).sort((a,b)=>Number(a)-Number(b));
   const current=latestSeason();
   const now=Date.now();

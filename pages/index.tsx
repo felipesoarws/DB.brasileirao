@@ -2,7 +2,7 @@ import type {GetServerSideProps} from 'next';
 import Link from 'next/link';
 import {useState,type FocusEvent,type MouseEvent} from 'react';
 import {dashboard} from '../lib/data/queries';
-import {Header,Kpis,MatchTable,StandingsTable,Team} from '../components/ui';
+import {Header,Kpis,MatchTable,StandingsScope,StandingsTable,Team} from '../components/ui';
 
 function GoalsBySeason({rows}:{rows:Array<{season:string;average:number;games:number}>}){
   const [hovered,setHovered]=useState<{row:{season:string;average:number;games:number};left:number;top:number;below:boolean}|null>(null);
@@ -23,7 +23,9 @@ function GoalsBySeason({rows}:{rows:Array<{season:string;average:number;games:nu
 }
 
 export default function Home({data}:any){
+  const [scope,setScope]=useState<'total'|'home'|'away'>('total');
   const titles=new Map<string,string[]>();
+  const visibleStandings=scope==='home'?data.standingsHome:scope==='away'?data.standingsAway:data.standings;
   const formatCount=(value:number)=>new Intl.NumberFormat('pt-BR').format(value);
   data.champions.filter((c:any)=>c.canonical_team_id).forEach((c:any)=>titles.set(c.canonical_team_id,[...(titles.get(c.canonical_team_id)||[]),String(c.season)]));
   return <>
@@ -31,8 +33,8 @@ export default function Home({data}:any){
     <Kpis items={[{label:'Temporadas',value:data.seasons},{label:'Partidas cadastradas',value:formatCount(data.total)},{label:'Gols marcados',value:formatCount(data.goals)},{label:'Média histórica · gols/jogo',value:data.average||'—'}]}/>
     <section className="section"><h2>Temporada atual</h2><p className="caption">Brasileirão {data.season}</p><div style={{marginTop:20}}><div className="match-section-heading"><h3>Últimos resultados</h3>{data.recentRound&&<Link className="btn" href={`/temporadas/${data.season}?tab=rodadas&round=${data.recentRound}`}>Ver a rodada inteira</Link>}</div><MatchTable matches={data.recent}/></div><div style={{marginTop:28}}><div className="match-section-heading"><h3>Próximos jogos</h3>{data.upcomingRound&&<Link className="btn" href={`/temporadas/${data.season}?tab=rodadas&round=${data.upcomingRound}`}>Ver a rodada inteira</Link>}</div><MatchTable matches={data.upcoming} empty="Não há próximos jogos publicados."/></div></section>
     <section className="section">
-      <div className="section-heading-row"><div><h2>Classificação {data.season}</h2><p className="caption">Tabela completa, calculada com os resultados finalizados disponíveis.</p></div><Link className="btn" href={`/temporadas/${data.season}?tab=classificacao&scope=geral`}>Abrir temporada</Link></div>
-      <StandingsTable rows={data.standings}/>
+      <div className="home-standings-heading"><div><h2>Classificação {data.season}</h2><p className="caption">Tabela completa, calculada com os resultados finalizados disponíveis.</p></div><div className="home-standings-controls"><StandingsScope value={scope} onChange={setScope}/><Link className="btn" href={`/temporadas/${data.season}?tab=classificacao&scope=${scope}`}>Abrir temporada</Link></div></div>
+      <StandingsTable rows={visibleStandings}/>
     </section>
     <section className="section grid2 analytics-grid">
       <div className="card chart-card"><h2>Média de gols por temporada</h2><p className="caption">Gols por jogo em todas as temporadas disponíveis.</p><GoalsBySeason rows={data.goalsBySeason}/></div>
