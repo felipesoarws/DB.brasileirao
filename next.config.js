@@ -18,6 +18,7 @@ module.exports = {
       '/recordes': tableFiles('historical_records','teams'),
       '/admin/qualidade': tableFiles('matches','teams','goals','lineups'),
       '/api/team-logo/[teamId]': tableFiles('teams'),
+      '/api/data-status': tableFiles('matches'),
     },
   },
 };

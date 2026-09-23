@@ -78,7 +78,7 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
   const maxGoals=Math.max(...goalsBySeason.map(row=>row.average),1);
 
   return <>
-    <Head><title>{team.name} — Brasileirão Database</title><meta name="description" content={`Estatísticas e histórico de temporadas de ${team.name} no Brasileirão Série A.`}/><link rel="icon" type="image/png" href={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`}/></Head>
+    <Head><title>{team.name} — Brasileirão Database</title><meta name="description" content={`Estatísticas e histórico de temporadas de ${team.name} no Brasileirão Série A.`}/><link key="favicon" rel="icon" type="image/png" href={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`}/></Head>
     <div className="club-detail" style={{'--club-color':color} as React.CSSProperties}>
       <header className="club-hero card">
         <Link className="club-back" href="/clubes" aria-label="Voltar para clubes">‹</Link>
