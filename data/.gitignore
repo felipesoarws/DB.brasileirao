@@ -2,9 +2,11 @@
 bronze/**
 silver/**
 gold/**
+gold-json/**
 
 !bronze/.gitkeep
 !silver/.gitkeep
 !gold/.gitkeep
+!gold-json/.gitkeep
 !README.md
 !.gitignore

@@ -1,26 +1,26 @@
-import { execFileSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import { gunzipSync } from 'zlib';
 
 export type Row = Record<string, any>;
 const root = path.resolve(process.cwd(), process.env.DATA_ROOT || 'data');
+const goldRoot = path.resolve(root, 'gold-json');
 const globalForGold = globalThis as typeof globalThis & {__brdbGoldCache?:Map<string,Row[]>;__brdbGoldVersion?:number};
 const cache = globalForGold.__brdbGoldCache ?? (globalForGold.__brdbGoldCache=new Map<string,Row[]>());
 
-/** Server-only Gold repository. Python/pyarrow is used solely to decode local Parquet. */
+/** Server-only Gold repository backed by JSON generated from Gold Parquet during build. */
 export function gold(name: string): Row[] {
-  const goldRoot = path.resolve(root, 'gold');
   const metadataPath=path.join(goldRoot,'_metadata.json');
   const version=fs.existsSync(metadataPath)?fs.statSync(metadataPath).mtimeMs:-1;
   if(globalForGold.__brdbGoldVersion!==version){cache.clear();globalForGold.__brdbGoldVersion=version;}
   if(cache.has(name))return cache.get(name)!;
   const base = path.resolve(goldRoot, name);
   if (!base.startsWith(`${goldRoot}${path.sep}`)) return [];
-  const source = fs.existsSync(base) && fs.statSync(base).isDirectory() ? base : `${base}.parquet`;
-  if (!fs.existsSync(source)) return [];
+  const source=`${base}.json.gz`;
+  if(!fs.existsSync(source))return [];
   try {
-    const script = "import json, pathlib, sys, pyarrow as a, pyarrow.parquet as p; x=pathlib.Path(sys.argv[1]); fs=sorted(x.rglob('*.parquet')) if x.is_dir() else [x]; ts=[p.ParquetFile(str(f)).read() for f in fs]; t=a.concat_tables(ts, promote_options='permissive') if len(ts)>1 else ts[0]; print(json.dumps(t.to_pylist(),default=str))";
-    const rows: Row[] = JSON.parse(execFileSync('python', ['-c', script, source], { maxBuffer: 120 * 1024 * 1024 }).toString());
+    const rows:Row[]=JSON.parse(gunzipSync(fs.readFileSync(source)).toString('utf8'));
+    if(!Array.isArray(rows))throw new Error(`Gold JSON table is not an array: ${source}`);
     const data = rows.map(row => ({
       ...row,
       ...(row.canonical_team_id == null && row.team_id != null ? { canonical_team_id: String(row.team_id) } : {}),
@@ -32,7 +32,10 @@ export function gold(name: string): Row[] {
       } : {}),
     }));
     cache.set(name, data); return data;
-  } catch { return []; }
+  } catch (error) {
+    if(process.env.NODE_ENV==='production')throw new Error(`Unable to read Gold table "${name}" from generated JSON`,{cause:error});
+    return [];
+  }
 }
 export const text = (v: unknown) => v == null || v === '' ? null : String(v);
 export const num = (v: unknown) => v == null || v === '' ? null : Number(v);
