@@ -29,6 +29,9 @@ públicas. O workflow também precisa do secret `VERCEL_TOKEN` para publicar. O
 deploy Git nativo do Vercel está desativado para evitar builds sem os dados; o
 workflow é o responsável pelo deploy de produção.
 
+Monitoramento, notificações de falha e procedimento de rollback estão em
+[`docs/OPERATIONS.md`](../docs/OPERATIONS.md).
+
 ## Produto web
 
 Pages e API Routes do produto consultam as tabelas JSON de build por meio de

@@ -6,6 +6,6 @@ export default function handler(req:NextApiRequest,res:NextApiResponse){
     res.setHeader('Allow','GET');
     return res.status(405).end();
   }
-  res.setHeader('Cache-Control','public, s-maxage=3600, stale-while-revalidate=86400');
+  res.setHeader('Cache-Control','no-store');
   return res.status(200).json({lastUpdated:updatedAt()});
 }

@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: production-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -20,6 +20,7 @@ jobs:
     env:
       VERCEL_ORG_ID: team_xAW98Uq2v6UKFo4udnLq9WBl
       VERCEL_PROJECT_ID: prj_vVfqyx5nYWJhRGPnwrz4RRTRhmcj
+      PRODUCTION_URL: https://brasileirao.felipesoarws.me
 
     steps:
       - name: Check out source
@@ -55,6 +56,7 @@ jobs:
           test -f ./data/gold/teams.parquet
           test -f ./data/gold/season_standings.parquet
           test -d ./data/gold/matches
+          jq -e '.updated_at | strings | select(length > 0)' ./data/gold/_metadata.json >/dev/null
 
       - name: Set up Python for Parquet conversion
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
@@ -99,3 +101,45 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: npx --yes vercel@59.25.4 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      - name: Verify production health and Gold snapshot
+        id: verify-production
+        shell: bash
+        run: |
+          expected_updated_at="$(jq -r '.updated_at' ./data/gold/_metadata.json)"
+          status_url="${PRODUCTION_URL}/api/data-status?workflow-check=${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          actual_updated_at=""
+          for attempt in $(seq 1 12); do
+            response="$(curl --silent --show-error --fail --max-time 20 "$status_url" 2>/dev/null || true)"
+            actual_updated_at="$(printf '%s' "$response" | jq -r '.lastUpdated // empty' 2>/dev/null || true)"
+            if [ "$actual_updated_at" = "$expected_updated_at" ]; then
+              break
+            fi
+            sleep 10
+          done
+          if [ "$actual_updated_at" != "$expected_updated_at" ]; then
+            echo "::error::Production Gold timestamp mismatch. Expected '$expected_updated_at'; got '${actual_updated_at:-no response}'."
+            exit 1
+          fi
+          for route in / /robots.txt /sitemap.xml; do
+            if ! curl --silent --show-error --fail --max-time 30 -o /dev/null "${PRODUCTION_URL}${route}"; then
+              echo "::error::Production health check failed for ${route}."
+              exit 1
+            fi
+          done
+          {
+            echo "## Production verification passed"
+            echo "- Gold snapshot timestamp: `${actual_updated_at}`"
+            echo "- Health checks: `/`, `/robots.txt`, `/sitemap.xml`"
+            echo "- Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Summarize deployment failure
+        if: ${{ failure() }}
+        shell: bash
+        run: |
+          {
+            echo "## Production workflow failed"
+            echo "Check the failed step and Vercel deployment logs before retrying. If a bad deployment became active, follow [docs/OPERATIONS.md](https://github.com/${GITHUB_REPOSITORY}/blob/master/docs/OPERATIONS.md) to roll back and pause scheduled deployments while investigating."
+            echo "- Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } >> "$GITHUB_STEP_SUMMARY"

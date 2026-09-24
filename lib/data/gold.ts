@@ -41,7 +41,18 @@ export const text = (v: unknown) => v == null || v === '' ? null : String(v);
 export const num = (v: unknown) => v == null || v === '' ? null : Number(v);
 export const by = (rows: Row[], key: string, value: string) => rows.filter(r => String(r[key]) === value);
 export function teamsMap() { return new Map(gold('teams').filter(t => t.canonical_team_id).map(t => [String(t.canonical_team_id), t])); }
-export function updatedAt() { const rows=gold('matches'); const dates=rows.map(r=>text(r.canonical_updated_at)).filter(Boolean).sort(); return dates.at(-1) || null; }
+export function updatedAt() {
+  const metadataPath=path.join(goldRoot,'_metadata.json');
+  try {
+    const metadata=JSON.parse(fs.readFileSync(metadataPath,'utf8')) as {updated_at?:unknown};
+    const snapshotDate=text(metadata.updated_at);
+    if(snapshotDate && !Number.isNaN(Date.parse(snapshotDate)))return snapshotDate;
+  } catch {}
+
+  // Older Gold snapshots may not include a load timestamp in their manifest.
+  const dates=gold('matches').map(row=>text(row.canonical_updated_at)).filter(Boolean).sort();
+  return dates.at(-1) || null;
+}
 export function seasons() { return [...new Set(gold('matches').map(r=>text(r.season)).filter(Boolean))].sort().reverse() as string[]; }
 export function latestSeason() { return seasons()[0] || null; }
 export function formatDate(m: Row) { const d=text(m.kickoff_utc)||text(m.kickoff_date); if (!d) return 'TBD'; const x=new Date(d); if(Number.isNaN(x.getTime())) return 'TBD'; const date=x.toLocaleDateString('pt-BR'); return m.kickoff_precision==='date' ? `${date} · TBD` : `${date} · ${x.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`; }
