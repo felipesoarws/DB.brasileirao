@@ -1,9 +1,10 @@
 import type {GetServerSideProps} from 'next';
-import Head from 'next/head';
 import Link from 'next/link';
 import {useEffect,useRef,useState,type CSSProperties,type FocusEvent,type MouseEvent} from 'react';
 import {gold,isFinished,latestSeason,Row} from '../../lib/data/gold';
 import {teamMatches as getTeamMatches} from '../../lib/data/queries';
+import Seo from '../../components/Seo';
+import {absoluteUrl,SITE_NAME} from '../../lib/site';
 
 type SeasonRow={season:number;points:number;played:number;won:number;drawn:number;lost:number;gf:number;ga:number;position:number|null;percentage:number};
 type GoalsRow={season:string;average:number;games:number};
@@ -77,9 +78,16 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
   const points:ChartPoint[]=chronological.flatMap(row=>{const x=seasonX.get(String(row.season));return x==null?[]:[{x,y:pad.top+plotHeight-(row.percentage/100)*plotHeight,...row}]});
   const line=points.map(point=>`${point.x},${point.y}`).join(' ');
   const maxGoals=Math.max(...goalsBySeason.map(row=>row.average),1);
+  const teamPath=`/clubes/${encodeURIComponent(team.canonical_team_id)}`;
+  const teamLogo=`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`;
+  const pageDescription=`Histórico do ${team.name} no Brasileirão Série A: ${stats.seasons} ${stats.seasons===1?'temporada':'temporadas'}, ${stats.matches} partidas, ${stats.wins} vitórias e campanhas por edição.`;
+  const structuredData={"@context":"https://schema.org","@graph":[
+    {"@type":"SportsTeam","@id":`${absoluteUrl(teamPath)}#team`,name:team.name,sport:'Association football',url:absoluteUrl(teamPath),logo:absoluteUrl(teamLogo),description:pageDescription,additionalProperty:{"@type":"PropertyValue",name:'Temporadas no Campeonato Brasileiro Série A',value:stats.seasons}},
+    {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem",position:1,name:'Início',item:absoluteUrl('/')},{"@type":"ListItem",position:2,name:'Clubes',item:absoluteUrl('/clubes')},{"@type":"ListItem",position:3,name:team.name,item:absoluteUrl(teamPath)}]}
+  ]};
 
   return <>
-    <Head><title>{team.name} — Database</title><meta name="description" content={`Estatísticas e histórico de temporadas de ${team.name} no Brasileirão Série A.`}/><link key="favicon" rel="icon" type="image/png" href={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`}/></Head>
+    <Seo title={`${team.name} | ${SITE_NAME}`} description={pageDescription} path={teamPath} icon={teamLogo} image={teamLogo} schema={structuredData}/>
     <div className="club-detail" style={{'--club-color':color} as React.CSSProperties}>
       <header className="club-hero card">
         <img className="club-hero-logo" src={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`} alt={`Escudo do ${team.name}`} onError={event=>{event.currentTarget.style.visibility='hidden'}}/>

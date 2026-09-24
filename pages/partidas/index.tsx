@@ -14,7 +14,7 @@ const queryString=(filters:MatchFilters,page:number)=>{
 
 export default function MatchesPage({rows,seasons:availableSeasons,rounds,filters,page,pageCount,total,seasonStats}:MatchPageProps){
   return <>
-    <Header title="Partidas" desc="Agenda e resultados do Brasileirão, temporada por temporada." meta={`${total.toLocaleString('pt-BR')} partidas encontradas`}/>
+    <Header title="Partidas" desc="Encontre jogos do Brasileirão Série A por temporada, rodada, clube e situação. Consulte placares, horários e detalhes das partidas." meta={`${total.toLocaleString('pt-BR')} partidas encontradas`}/>
     <Kpis items={[
       {label:'Temporada',value:filters.season},
       {label:'Partidas na temporada',value:seasonStats.matches.toLocaleString('pt-BR')},

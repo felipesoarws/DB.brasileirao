@@ -33,6 +33,7 @@ module.exports = {
       '/partidas/[matchId]': tableFiles('matches','teams','goals','match_timeline','lineups','statistics_by_period','odds'),
       '/recordes': tableFiles('historical_records','teams'),
       '/admin/qualidade': tableFiles('matches','teams','goals','lineups'),
+      '/sitemap.xml': tableFiles('matches','teams'),
       '/api/team-logo/[teamId]': tableFiles('teams'),
       '/api/data-status': tableFiles('matches'),
   },

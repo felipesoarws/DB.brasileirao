@@ -18,7 +18,7 @@ export default function SeasonsPage({rows}:{rows:SeasonSummary[]}){
   const current=rows.find(row=>row.current);
   const archive=rows.filter(row=>!row.current);
   return <>
-    <PageHeader title="Temporadas" desc="Explore a história do Brasileirão Série A, temporada por temporada." meta={`${rows.length} temporadas`}/>
+    <PageHeader title="Temporadas" desc="Compare campeões, classificações, partidas e gols de cada edição do Campeonato Brasileiro Série A." meta={`${rows.length} temporadas`}/>
     <div className="season-archive">
       {current&&<section className="season-current-card card" aria-labelledby="season-current-title">
         <div className="season-current-top"><div><span className="season-eyebrow">Temporada atual</span><h2 id="season-current-title">Brasileirão {current.season}</h2></div><span className="season-live-badge"><i/>Em andamento</span></div>

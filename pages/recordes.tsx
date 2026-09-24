@@ -187,7 +187,7 @@ export default function Records({
     <>
       <Header
         title="Recordes históricos"
-        desc="Marcas individuais, de temporada e partidas memoráveis no Brasileirão Série A."
+        desc="Consulte recordes de clubes, temporadas e partidas do Brasileirão Série A, incluindo gols, vitórias, derrotas e saldos extremos."
       />
       <Kpis
         items={[

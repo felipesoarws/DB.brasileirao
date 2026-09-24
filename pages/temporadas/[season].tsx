@@ -110,7 +110,7 @@ export default function Season({season,table,tableHome,tableAway,matches,tab,rou
   const visibleMatches=matches.filter((m:Match)=>Number(m.round)===Number(selectedRound));
   const showsRound=tab==='rodadas'||tab==='partidas'||!tab||tab==='overview';
   return <>
-    <Header title={`Brasileirão ${season}`} desc="Dados canônicos publicados para a temporada."/>
+    <Header title={`Brasileirão ${season}`} desc={`Classificação, resultados, líderes por rodada, artilharia e estatísticas do Campeonato Brasileiro Série A ${season}. Os números da edição em andamento são parciais.`}/>
     <nav className="tabs season-tabs">{tabs.map(([v,l])=><Link className={(tab||'overview')===v?'active':''} href={`/temporadas/${season}${v==='overview'?'':`?tab=${v}`}`} key={v}>{l}</Link>)}</nav>
     {tab!=='estatisticas'&&tab!=='artilharia'&&tab!=='lideres'&&<Kpis items={[{label:'Partidas',value:matches.length},{label:'Clubes',value:table.length},{label:'Finalizadas',value:matches.filter((m:Match)=>isFinished(m)).length},{label:'Rodadas',value:rounds.length}]}/>}
     {(tab==='classificacao'||!tab||tab==='overview')&&<section className="section"><div className="season-classification-heading"><h2>Classificação</h2><StandingsScope value={scope} onChange={setScope}/></div><StandingsTable rows={visibleTable}/></section>}

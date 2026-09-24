@@ -51,7 +51,7 @@ export default function TeamTimelinePage({clubs,seasons,teamId,season,team,point
   const isSeasonComplete=pendingRounds.length===0;
   const color=team?.color?`#${team.color.replace(/^#/,'')}`:'var(--theme-brand-primary)';
   return <>
-    <Header title="Linha do tempo" desc="Acompanhe a posição de um clube rodada a rodada até o fim do campeonato."/>
+    <Header title="Linha do tempo" desc="Veja como a posição de um clube mudou a cada rodada do Brasileirão Série A e acompanhe os lugares ainda sem classificação confirmada."/>
     <form ref={formRef} className="position-timeline-filters card" method="get" action="/linha-do-tempo">
       <TeamSelect name="time" label="Time" teams={clubs} value={selectedTeamId} onChange={id=>{setSelectedTeamId(id);setSelectedSeason('')}} autoSubmit/>
       <StyledSelect name="temporada" label="Temporada" value={selectedSeason} onChange={setSelectedSeason} options={[{value:'',label:'Temporada mais recente'},...seasons.map(value=>({value,label:value}))]}/>

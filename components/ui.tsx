@@ -1,8 +1,10 @@
-import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
+import {useRouter} from 'next/router';
 import {createPortal} from 'react-dom';
 import {useState,type FocusEvent,type MouseEvent} from 'react';
+import Seo from './Seo';
+import {SITE_NAME} from '../lib/site';
 
 export type Row=Record<string,any>;
 
@@ -23,8 +25,11 @@ const formatMobileDate=(m:Row)=>{
   return {date:shortDate,time};
 };
 
-export function Header({title,desc,meta,browserTitle}:{title:string,desc?:string,meta?:string,browserTitle?:string}){
-  return <><Head><title>{browserTitle||`${title} — Database`}</title><meta name="description" content={desc||'Base independente para explorar o Brasileirão Série A.'}/></Head><header className="page-head"><div><h1 className="page-title">{title}</h1>{desc&&<p className="desc">{desc}</p>}</div>{meta&&<span className="caption mono">{meta}</span>}</header></>;
+export function Header({title,desc,meta,browserTitle,path,schema}:{title:string,desc?:string,meta?:string,browserTitle?:string,path?:string,schema?:Record<string,unknown>}){
+  const router=useRouter();
+  const canonicalPath=path||router.asPath.split(/[?#]/,1)[0]||'/';
+  const description=desc||'Explore dados históricos, partidas, classificações e estatísticas do Campeonato Brasileiro Série A.';
+  return <><Seo title={browserTitle||`${title} | ${SITE_NAME}`} description={description} path={canonicalPath} schema={schema}/><header className="page-head"><div><h1 className="page-title">{title}</h1>{desc&&<p className="desc">{desc}</p>}</div>{meta&&<span className="caption mono">{meta}</span>}</header></>;
 }
 
 export function Team({id,name,color,reverse=false}:{id:string,name:string,color?:string|null,logo?:string|null,reverse?:boolean}){

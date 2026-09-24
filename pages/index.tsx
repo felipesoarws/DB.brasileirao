@@ -3,6 +3,7 @@ import Link from 'next/link';
 import {useState,type FocusEvent,type MouseEvent} from 'react';
 import {dashboard} from '../lib/data/queries';
 import {Header,Kpis,MatchTable,StandingsScope,StandingsTable,Team} from '../components/ui';
+import {absoluteUrl,SITE_NAME} from '../lib/site';
 
 function GoalsBySeason({rows}:{rows:Array<{season:string;average:number;games:number}>}){
   const [hovered,setHovered]=useState<{row:{season:string;average:number;games:number};left:number;top:number;below:boolean}|null>(null);
@@ -27,9 +28,10 @@ export default function Home({data}:any){
   const titles=new Map<string,string[]>();
   const visibleStandings=scope==='home'?data.standingsHome:scope==='away'?data.standingsAway:data.standings;
   const formatCount=(value:number)=>new Intl.NumberFormat('pt-BR').format(value);
+  const siteSchema={"@context":"https://schema.org","@type":"WebSite",name:SITE_NAME,alternateName:'Base de dados do Brasileirão Série A',url:absoluteUrl('/'),inLanguage:'pt-BR',description:'Dados históricos, resultados, classificação e estatísticas do Campeonato Brasileiro Série A.'};
   data.champions.filter((c:any)=>c.canonical_team_id).forEach((c:any)=>titles.set(c.canonical_team_id,[...(titles.get(c.canonical_team_id)||[]),String(c.season)]));
   return <>
-    <Header title="Brasileirão Série A" desc="Resultados, classificação e números da base histórica."/>
+    <Header title="Brasileirão Série A" desc="Consulte resultados, classificação, estatísticas e recordes do Campeonato Brasileiro Série A, com recortes por temporada, clube e partida." schema={siteSchema}/>
     <Kpis items={[{label:'Temporadas',value:data.seasons},{label:'Partidas cadastradas',value:formatCount(data.total)},{label:'Gols marcados',value:formatCount(data.goals)},{label:'Média histórica · gols/jogo',value:data.average||'—'}]}/>
     <section className="section"><h2>Temporada atual</h2><p className="caption">Brasileirão {data.season}</p><div style={{marginTop:20}}><div className="match-section-heading"><h3>Últimos resultados</h3>{data.recentRound&&<Link className="btn" href={`/temporadas/${data.season}?tab=rodadas&round=${data.recentRound}`}>Ver a rodada inteira</Link>}</div><MatchTable matches={data.recent}/></div><div style={{marginTop:28}}><div className="match-section-heading"><h3>Próximos jogos</h3>{data.upcomingRound&&<Link className="btn" href={`/temporadas/${data.season}?tab=rodadas&round=${data.upcomingRound}`}>Ver a rodada inteira</Link>}</div><MatchTable matches={data.upcoming} empty="Não há próximos jogos publicados."/></div></section>
     <section className="section">

@@ -4,9 +4,11 @@ function Section({title,children}:{title:string;children:React.ReactNode}){retur
 
 export default function About(){
   return <Institutional title="Sobre" desc="O Database é uma plataforma independente para explorar dados, temporadas e histórias do Campeonato Brasileiro Série A.">
-    <Section title="O que você encontra">Consulte a classificação geral, como mandante ou visitante; partidas e seus detalhes; páginas individuais dos clubes; e o histórico das temporadas.</Section>
-    <Section title="Explore os dados">A plataforma também reúne estatísticas por temporada e clube, artilharia quando disponível, recordes históricos, comparações de confronto direto e a evolução da posição dos times rodada a rodada.</Section>
-    <Section title="Dados em atualização">Temporadas em andamento podem conter jogos ainda não disputados e classificações parciais. Indicadores dependem dos dados disponíveis para cada competição, time e partida; informações ausentes são mostradas como indisponíveis, não como zero.</Section>
+    <Section title="Explore o Brasileirão">Consulte resultados por rodada, classificação geral e recortes de mandante e visitante, estatísticas de clubes e partidas, artilharia quando disponível, recordes e campanhas históricas.</Section>
+    <Section title="Uma página para cada recorte">As páginas de temporada reúnem jogos, classificação e líderes por rodada. As páginas dos clubes organizam campanhas por edição; o detalhe de cada partida reúne placar, escalações e estatísticas publicadas para aquele jogo.</Section>
+    <Section title="Como interpretar os números">Os indicadores são calculados somente quando há dados suficientes. Gols por jogo consideram partidas finalizadas com placar disponível; aproveitamento é a proporção de pontos conquistados sobre os pontos possíveis nos jogos disputados. Os recortes de casa e fora usam o mando registrado em cada partida.</Section>
+    <Section title="Temporadas em andamento">A edição atual apresenta dados parciais. Jogos futuros não entram em resultados concluídos; líderes e posições de rodadas ainda não encerradas podem permanecer sem confirmação. Um dado ausente é mostrado como indisponível, não como zero.</Section>
+    <Section title="Atualização e cobertura">A data da última atualização disponível é exibida no menu lateral. A cobertura de escalações, estatísticas e outros indicadores pode variar de uma temporada ou partida para outra; a página informa quando um dado não está disponível.</Section>
     <Section title="Projeto independente">Database não é um produto oficial da CBF nem representa clubes, atletas ou competições. A identidade visual dos times é usada para facilitar sua identificação.</Section>
     <Section title="Contato e correções">Encontrou algo que merece revisão ou quer conversar sobre o projeto? <a href="https://www.linkedin.com/in/felipesoarws/" target="_blank" rel="noreferrer">Fale comigo pelo LinkedIn</a>.</Section>
   </Institutional>;

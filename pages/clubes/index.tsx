@@ -21,7 +21,7 @@ export default function ClubsPage({activeClubs,formerClubs,season}:{activeClubs:
   const historic=useMemo(()=>formerClubs.filter(matches),[formerClubs,normalizedQuery]);
   const totalVisible=current.length+historic.length;
   return <>
-    <Header title="Clubes" desc="Clubes que disputam e já disputaram a Série A do Brasileirão." meta={`${activeClubs.length} na edição ${season} · ${activeClubs.length+formerClubs.length} no acervo`}/>
+    <Header title="Clubes" desc="Consulte campanhas, títulos, partidas e estatísticas dos clubes que disputam ou já disputaram o Brasileirão Série A." meta={`${activeClubs.length} na edição ${season} · ${activeClubs.length+formerClubs.length} no acervo`}/>
     <div className="club-directory-tools">
       <label className="club-directory-search"><span aria-hidden="true">⌕</span><input aria-label="Buscar clube" placeholder="Buscar clube pelo nome…" value={query} onChange={event=>setQuery(event.target.value)}/>{query&&<button type="button" onClick={()=>setQuery('')} aria-label="Limpar busca">×</button>}</label>
       <span className="club-directory-result-count" aria-live="polite">{totalVisible} {totalVisible===1?'clube encontrado':'clubes encontrados'}</span>

@@ -14,7 +14,7 @@ export default function HeadToHeadPage({clubs,homeId,awayId,mode,homeName,awayNa
   const ready=Boolean(selectedHome&&selectedAway);
   const modeLabel=mode==='home'?`${homeName} como mandante`:mode==='away'?`${awayName} como mandante`:'Todos os confrontos',homeColor=clubs.find(club=>club.id===selectedHome)?.color||'var(--theme-brand-primary)',awayColor=clubs.find(club=>club.id===selectedAway)?.color||'var(--theme-text-muted)';
   return <>
-    <Header title="Confronto direto" desc="Compare o histórico de partidas entre dois clubes do Brasileirão."/>
+    <Header title="Confronto direto" desc="Compare vitórias, empates, gols e resultados do histórico entre dois clubes do Campeonato Brasileiro Série A, com recortes por mando de campo."/>
     <form className="head-to-head-filters card" method="get" action="/confrontos">
       <TeamSelect name="mandante" label="Mandante" teams={clubs} value={selectedHome} onChange={id=>{setSelectedHome(id);if(id===selectedAway)setSelectedAway('')}} autoSubmit excludeIds={selectedAway?[selectedAway]:[]}/>
       <TeamSelect name="visitante" label="Visitante" teams={clubs} value={selectedAway} onChange={setSelectedAway} autoSubmit excludeIds={selectedHome?[selectedHome]:[]}/>

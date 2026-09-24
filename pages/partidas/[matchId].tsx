@@ -2,6 +2,7 @@ import type {GetServerSideProps} from 'next';
 import {useState} from 'react';
 import {Header,Status,Team} from '../../components/ui';
 import type {Row} from '../../lib/data/gold';
+import {absoluteUrl} from '../../lib/site';
 
 type MatchEvent={teamId:string;teamName:string;minute:number|null;addedTime:number;kind:'goal'|'card';playerName:string;assistName:string|null;card:string|null;ownGoal:boolean;penalty:boolean};
 type MatchStat={key:string;homeValue:number|string|null;awayValue:number|string|null};
@@ -120,12 +121,19 @@ export default function MatchDetailPage({match,events,lineups,statPeriods,predic
   if(!match)return <><Header title="Partida não encontrada"/><div className="empty">A partida solicitada não está publicada na Gold.</div></>;
   const done=['finished','final','ft','status_final'].includes(String(match.status).toLowerCase()),homeName=String(match.canonical_home_team_name||match.home?.name||'Mandante'),awayName=String(match.canonical_away_team_name||match.away?.name||'Visitante'),competitionName=String(match.competition||'').toUpperCase()==='BRA_SERIE_A'?'Brasileirão':String(match.competition||'Brasileirão');
   const browserTitle=`${homeName} x ${awayName} — Rodada ${match.round??'—'} — Brasileirão ${match.season}`;
+  const matchPath=`/partidas/${encodeURIComponent(match.canonical_match_id)}`;
+  const pageDescription=done&&match.home_score!=null&&match.away_score!=null?`${homeName} ${match.home_score} a ${match.away_score} ${awayName}: placar, estatísticas, escalações e lances da rodada ${match.round??'—'} do Brasileirão ${match.season}.`:`Prévia de ${homeName} x ${awayName}, rodada ${match.round??'—'} do Brasileirão ${match.season}, com horário, estatísticas e dados disponíveis.`;
+  const startDate=dateValueForSchema(match.kickoff_utc||match.kickoff_date,match.kickoff_precision);
+  const matchSchema={"@context":"https://schema.org","@graph":[
+    {"@type":"SportsEvent","@id":`${absoluteUrl(matchPath)}#event`,name:browserTitle,url:absoluteUrl(matchPath),sport:'Soccer',description:pageDescription,...(startDate?{startDate}:{}),homeTeam:{"@type":"SportsTeam",name:homeName,url:absoluteUrl(`/clubes/${encodeURIComponent(match.canonical_home_team_id)}`)},awayTeam:{"@type":"SportsTeam",name:awayName,url:absoluteUrl(`/clubes/${encodeURIComponent(match.canonical_away_team_id)}`)},...(match.venue?{location:{"@type":"Place",name:String(match.venue)}}:{})},
+    {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem",position:1,name:'Início',item:absoluteUrl('/')},{"@type":"ListItem",position:2,name:'Partidas',item:absoluteUrl('/partidas')},{"@type":"ListItem",position:3,name:browserTitle,item:absoluteUrl(matchPath)}]}
+  ]};
   const dateValue=match.kickoff_utc||match.kickoff_date;
   const matchDate=dateValue?new Date(dateValue).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'long',year:'numeric'}):'Data a definir';
   const matchTime=dateValue&&match.kickoff_precision!=='date'?new Date(dateValue).toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}):null;
   const onlyDateAndVenue=Boolean(match.venue)&&!match.referee&&match.attendance==null;
   return <div className="match-detail-page">
-    <Header title={done?'Detalhe da partida':'Prévia da partida'} browserTitle={browserTitle} desc={`${competitionName} ${match.season} · Rodada ${match.round??'—'}`} meta={`Partida ${match.canonical_match_id}`}/>
+    <Header title={done?'Detalhe da partida':'Prévia da partida'} browserTitle={browserTitle} desc={pageDescription} path={matchPath} schema={matchSchema} meta={`Partida ${match.canonical_match_id}`}/>
     <section className="match-detail-hero card" aria-label="Placar e informações da partida">
       <div className="match-detail-topline"><span>{competitionName} <i/> Temporada {match.season} <i/> Rodada {match.round??'—'}</span><Status status={match.status}/></div>
       <div className="match-detail-scoreline"><Team id={String(match.canonical_home_team_id)} name={homeName} color={match.home?.color}/><div className="match-score-center"><strong className="numeric">{done&&match.home_score!=null?`${match.home_score} — ${match.away_score}`:'—'}</strong>{done&&match.home_score_ht!=null&&match.away_score_ht!=null&&<span>Intervalo {match.home_score_ht} — {match.away_score_ht}</span>}</div><Team reverse id={String(match.canonical_away_team_id)} name={awayName} color={match.away?.color}/></div>
@@ -142,6 +150,13 @@ export default function MatchDetailPage({match,events,lineups,statPeriods,predic
 
     <OddsPanel odds={odds} oddsCapturedAt={oddsCapturedAt} preKickoffOdds={preKickoffOdds}/>
   </div>;
+}
+
+function dateValueForSchema(value:unknown,precision:unknown){
+  if(value==null||value==='')return undefined;
+  const raw=String(value),date=new Date(raw);
+  if(Number.isNaN(date.getTime()))return undefined;
+  return precision==='date'?raw.slice(0,10):date.toISOString();
 }
 
 export const getServerSideProps:GetServerSideProps<MatchPageProps>=async({params})=>{
