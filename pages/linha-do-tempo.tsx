@@ -40,7 +40,7 @@ export default function TeamTimelinePage({clubs,seasons,teamId,season,team,point
   const formRef=useRef<HTMLFormElement>(null),[selectedTeamId,setSelectedTeamId]=useState(teamId),[selectedSeason,setSelectedSeason]=useState(season);
   const confirmedPoints=points.filter((point):point is PositionPoint&{position:number}=>point.confirmed&&point.position!==null),positions=confirmedPoints.map(point=>point.position),finalPosition=confirmedPoints.at(-1)?.position??null,pendingRounds=points.filter(point=>!point.confirmed).map(point=>point.round);
   const isSeasonComplete=pendingRounds.length===0;
-  const color=team?.color?`#${team.color.replace(/^#/,'')}`:'#087A46';
+  const color=team?.color?`#${team.color.replace(/^#/,'')}`:'var(--theme-brand-primary)';
   return <>
     <Header title="Linha do tempo" desc="Acompanhe a posição de um clube rodada a rodada até o fim do campeonato."/>
     <form ref={formRef} className="position-timeline-filters card" method="get" action="/linha-do-tempo">

@@ -58,7 +58,7 @@ function ClubRecordCard({ record }: { record: ClubRecord }) {
               ? leader.color.startsWith("#")
                 ? leader.color
                 : `#${leader.color}`
-              : "#087A46";
+              : "var(--theme-brand-primary)";
           return (
             <div
               className="club-record-leader"

@@ -12,7 +12,7 @@ type MeetingPageProps={clubs:Club[];homeId:string;awayId:string;mode:'all'|'home
 export default function HeadToHeadPage({clubs,homeId,awayId,mode,homeName,awayName,rows,totals}:MeetingPageProps){
   const [selectedHome,setSelectedHome]=useState(homeId),[selectedAway,setSelectedAway]=useState(awayId);
   const ready=Boolean(selectedHome&&selectedAway);
-  const modeLabel=mode==='home'?`${homeName} como mandante`:mode==='away'?`${awayName} como mandante`:'Todos os confrontos',homeColor=clubs.find(club=>club.id===selectedHome)?.color||'#087A46',awayColor=clubs.find(club=>club.id===selectedAway)?.color||'#737373';
+  const modeLabel=mode==='home'?`${homeName} como mandante`:mode==='away'?`${awayName} como mandante`:'Todos os confrontos',homeColor=clubs.find(club=>club.id===selectedHome)?.color||'var(--theme-brand-primary)',awayColor=clubs.find(club=>club.id===selectedAway)?.color||'var(--theme-text-muted)';
   return <>
     <Header title="Confronto direto" desc="Compare o histórico de partidas entre dois clubes do Brasileirão."/>
     <form className="head-to-head-filters card" method="get" action="/confrontos">
@@ -23,7 +23,7 @@ export default function HeadToHeadPage({clubs,homeId,awayId,mode,homeName,awayNa
     </form>
     {!ready?<div className="empty">Selecione o mandante e o visitante para consultar o histórico entre eles.</div>:<>
       <div className="head-to-head-title"><div><h2>{homeName} <span>x</span> {awayName}</h2><p className="caption">{modeLabel} · partidas finalizadas</p></div><span className="caption">{totals.played} {totals.played===1?'partida':'partidas'}</span></div>
-      <section className="head-to-head-summary" aria-label="Resumo do confronto" style={{'--home-team':homeColor.startsWith('#')?homeColor:`#${homeColor}`,'--away-team':awayColor.startsWith('#')?awayColor:`#${awayColor}`} as CSSProperties}>
+      <section className="head-to-head-summary" aria-label="Resumo do confronto" style={{'--home-team':homeColor.startsWith('#')||homeColor.startsWith('var(')?homeColor:`#${homeColor}`,'--away-team':awayColor.startsWith('#')||awayColor.startsWith('var(')?awayColor:`#${awayColor}`} as CSSProperties}>
         <article className="head-to-head-stat is-home"><span>Vitórias · {homeName}</span><strong>{totals.homeWins}</strong></article>
         <article className="head-to-head-stat is-draw"><span>Empates</span><strong>{totals.draws}</strong></article>
         <article className="head-to-head-stat is-away"><span>Vitórias · {awayName}</span><strong>{totals.awayWins}</strong></article>

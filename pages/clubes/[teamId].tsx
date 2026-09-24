@@ -67,7 +67,7 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
     setHovered({kind,row,left:Math.max(12+halfWidth,Math.min(window.innerWidth-12-halfWidth,rect.left+rect.width/2)),top:rect.top,below:rect.top<130});
   };
   const closePopover=()=>setHovered(null);
-  const color=team.color?`#${String(team.color).replace(/^#/,'')}`:'#087A46';
+  const color=team.color?`#${String(team.color).replace(/^#/,'')}`:'var(--theme-brand-primary)';
   const chartWidth=Math.max(300,chartViewportWidth),chartHeight=300,pad={top:18,right:14,bottom:32,left:38};
   const plotWidth=chartWidth-pad.left-pad.right,plotHeight=chartHeight-pad.top-pad.bottom;
   const seasonAxis=goalsBySeason.map((row,index)=>({season:row.season,index,x:pad.left+(goalsBySeason.length<2?plotWidth/2:index*plotWidth/(goalsBySeason.length-1))}));
