@@ -9,7 +9,9 @@ type StatPeriod={key:string;label:string;stats:MatchStat[]};
 type MatchPlayer={id:string;name:string;position:string|null;shirtNumber:number|null;starter:boolean};
 type LineupTeam={id:string;name:string;color:string|null;starters:MatchPlayer[];reserves:MatchPlayer[]};
 type MatchOdd={provider:string;market:string;selection:string;price:number;collectedAt:string};
-type MatchPageProps={match:Row|null;events:MatchEvent[];lineups:LineupTeam[];statPeriods:StatPeriod[];odds:MatchOdd[];oddsCapturedAt:string|null;preKickoffOdds:number};
+type ScorePrediction={homeGoals:number;awayGoals:number;probability:number};
+type MatchForecast={homeExpectedGoals:number;awayExpectedGoals:number;scores:ScorePrediction[]};
+type MatchPageProps={match:Row|null;events:MatchEvent[];lineups:LineupTeam[];statPeriods:StatPeriod[];predictions:MatchForecast;odds:MatchOdd[];oddsCapturedAt:string|null;preKickoffOdds:number};
 
 const statLabels:Record<string,string>={
   possession:'Posse de bola',total_shots:'Finalizações',shots_on_target:'Chutes no gol',shots_off_target:'Finalizações para fora',blockedShots:'Finalizações bloqueadas',shotPct:'Precisão das finalizações',
@@ -56,7 +58,7 @@ function MatchStats({periods,homeId,awayId,homeName,awayName}:{periods:StatPerio
         if(!rows.length)return null;
         return <section className="match-stat-category" key={category.key}><h3>{category.label}</h3>{rows.map(stat=>{
           const home=Number(stat.homeValue)||0,away=Number(stat.awayValue)||0,total=home+away,homeShare=total?home/total*100:50,awayShare=total?away/total*100:50;
-          return <div className="match-stat-row" key={stat.key}><div className="match-stat-values"><strong>{formatStat(stat,stat.key,'homeValue')}</strong><span>{statLabels[stat.key]||stat.key}</span><strong>{formatStat(stat,stat.key,'awayValue')}</strong></div><div className="match-stat-meter" aria-hidden="true"><i style={{width:`${homeShare}%`}}/><i style={{width:`${awayShare}%`}}/></div></div>;
+          return <div className="match-stat-row" key={stat.key}><div className="match-stat-values"><strong>{formatStat(stat,stat.key,'homeValue')}</strong><span>{statLabels[stat.key]||stat.key}</span><strong>{formatStat(stat,stat.key,'awayValue')}</strong></div>{total>0&&<div className="match-stat-meter" aria-hidden="true"><i style={{width:`${homeShare}%`}}/><i style={{width:`${awayShare}%`}}/></div>}</div>;
         })}</section>;
       })}
     </div>)}</div>
@@ -89,7 +91,31 @@ function OddsPanel({odds,oddsCapturedAt,preKickoffOdds}:{odds:MatchOdd[];oddsCap
   return <section className="match-detail-section match-odds-section card"><div className="match-section-heading"><div><span className="match-section-kicker">MERCADO</span><h2>Cotações</h2></div></div><p className="match-data-note">Não há coleta anterior ao início desta partida ({preKickoffOdds} registros pré-jogo). Valores abaixo são snapshots posteriores; última coleta: {collectionDate}.</p><p className="match-betting-notice"><strong>Aviso:</strong> apostar não é investimento. Apostas envolvem riscos e podem causar perdas financeiras.</p><div className="match-odds-grid">{[...grouped.entries()].map(([key,items])=>{const [,market]=key.split('|');return <article className="match-odd-market" key={key}><h3>{marketName(market)}</h3><div>{items.map(item=><p key={`${item.selection}-${item.collectedAt}`}><span>{selectionName(item.selection)}</span><strong>{item.price.toFixed(2)}</strong></p>)}</div></article>})}</div></section>;
 }
 
-export default function MatchDetailPage({match,events,lineups,statPeriods,odds,oddsCapturedAt,preKickoffOdds}:MatchPageProps){
+function GoalDistribution({id,name,expected,side}:{id:string;name:string;expected:number;side:'home'|'away'}){
+  const poisson=(goals:number)=>Math.exp(-expected)*Math.pow(expected,goals)/[1,1,2,6][goals];
+  const exact=[0,1,2,3].map(goals=>poisson(goals)),tail=Math.max(0,1-exact.reduce((sum,value)=>sum+value,0));
+  const probabilities=[...exact,tail],max=Math.max(...probabilities,.01),labels=['0','1','2','3','4+'];
+  return <div className={`match-goal-distribution is-${side}`}>
+    <div className="match-goal-distribution-heading" title={name}><img src={`/api/team-logo/${encodeURIComponent(id)}`} alt={name}/><strong className="numeric">{expected.toFixed(1)}</strong></div>
+    <div className="match-goal-bars" role="list" aria-label={`Distribuição de gols estimada para ${name}`}>{probabilities.map((probability,index)=><div className="match-goal-bar" role="listitem" key={labels[index]} aria-label={`${labels[index]} gols: ${Math.round(probability*100)} por cento`}><div className="match-goal-bar-plot"><span className="match-goal-bar-value numeric">{labels[index]}</span><div className="match-goal-bar-track"><i style={{height:`${Math.max(3,probability/max*100)}%`}}/></div></div><span className="match-goal-bar-percent numeric">{Math.round(probability*100)}%</span></div>)}</div>
+  </div>;
+}
+
+function ScorePredictions({forecast,homeId,awayId,homeName,awayName,homeScore,awayScore,finished}:{forecast:MatchForecast;homeId:string;awayId:string;homeName:string;awayName:string;homeScore:number|null;awayScore:number|null;finished:boolean}){
+  const [showForecastInfo,setShowForecastInfo]=useState(false);
+  const {scores,homeExpectedGoals,awayExpectedGoals}=forecast;
+  if(!scores.length)return null;
+  return <section className="match-detail-section card match-predictions" aria-label="Probabilidades e expectativas de gols">
+    <div className="match-prediction-layout">
+      <div className="match-prediction-probabilities"><div className="match-section-heading"><div><span className="match-section-kicker">PROBABILIDADES</span><h2>Placares mais prováveis</h2></div></div>
+        <ol className="match-prediction-list">{scores.map(item=>{const chance=item.probability*100,occurred=finished&&homeScore===item.homeGoals&&awayScore===item.awayGoals;return <li className={`match-prediction-item${occurred?' is-realized':''}`} key={`${item.homeGoals}-${item.awayGoals}`} aria-label={`${item.homeGoals} a ${item.awayGoals}, ${chance<.5?'menos de 1':Math.round(chance)} por cento${occurred?', placar final realizado':''}`}><strong className="numeric"><img src={`/api/team-logo/${encodeURIComponent(homeId)}`} alt=""/><span>{item.homeGoals}</span><i>—</i><span>{item.awayGoals}</span><img src={`/api/team-logo/${encodeURIComponent(awayId)}`} alt=""/></strong><span className="numeric">{chance<.5?'<1%':`${Math.round(chance)}%`}</span></li>})}</ol>
+      </div>
+      <div className="match-goal-forecast"><div className="match-goal-forecast-heading"><div><span className="match-section-kicker">EXPECTATIVA DE GOLS</span><h2>Distribuição por time</h2></div><div className="match-goal-total"><strong className="numeric">{(homeExpectedGoals+awayExpectedGoals).toFixed(1)} <small>gols</small></strong><button type="button" className="match-forecast-help" aria-label="Como é calculada a expectativa de gols?" aria-expanded={showForecastInfo} aria-controls="match-forecast-explanation" onClick={()=>setShowForecastInfo(value=>!value)}>?</button>{showForecastInfo&&<div className="match-forecast-popover" id="match-forecast-explanation" role="dialog" aria-label="Como é calculada a expectativa de gols"><strong>Como calculamos</strong><p>Usamos somente a forma recente (últimos 8 jogos) e o desempenho no mando (até 8 jogos como mandante ou visitante), sempre com partidas anteriores a esta.</p><p>Os jogos mais recentes pesam mais: o peso cai por um fator de 0,82 a cada partida mais antiga. A estimativa combina 58% da forma recente com 42% do desempenho no mando.</p><p>Para cada equipe, cruzamos a média de gols marcados com a média de gols sofridos pelo adversário. Se ainda não houver jogos suficientes no mando, usamos a média recente como referência.</p></div>}</div></div><div className="match-goal-distributions"><GoalDistribution id={homeId} name={homeName} expected={homeExpectedGoals} side="home"/><GoalDistribution id={awayId} name={awayName} expected={awayExpectedGoals} side="away"/></div></div>
+    </div>
+  </section>;
+}
+
+export default function MatchDetailPage({match,events,lineups,statPeriods,predictions,odds,oddsCapturedAt,preKickoffOdds}:MatchPageProps){
   if(!match)return <><Header title="Partida não encontrada"/><div className="empty">A partida solicitada não está publicada na Gold.</div></>;
   const done=['finished','final','ft','status_final'].includes(String(match.status).toLowerCase()),homeName=String(match.canonical_home_team_name||match.home?.name||'Mandante'),awayName=String(match.canonical_away_team_name||match.away?.name||'Visitante'),competitionName=String(match.competition||'').toUpperCase()==='BRA_SERIE_A'?'Brasileirão':String(match.competition||'Brasileirão');
   const browserTitle=`${homeName} x ${awayName} — Rodada ${match.round??'—'} — Brasileirão ${match.season}`;
@@ -105,6 +131,7 @@ export default function MatchDetailPage({match,events,lineups,statPeriods,odds,o
       <div className={`match-detail-facts${match.attendance==null?' is-without-attendance':''}${onlyDateAndVenue?' is-date-venue-only':''}`}><span><small>DATA</small><strong>{matchDate}{matchTime?` · ${matchTime}`:''}</strong></span>{match.venue&&<span><small>ESTÁDIO</small><strong>{match.venue}</strong></span>}{match.referee&&<span><small>ÁRBITRO</small><strong>{match.referee}</strong></span>}{match.attendance!=null&&<span><small>PÚBLICO</small><strong>{Number(match.attendance).toLocaleString('pt-BR')}</strong></span>}</div>
     </section>
 
+    <ScorePredictions forecast={predictions} homeId={String(match.canonical_home_team_id)} awayId={String(match.canonical_away_team_id)} homeName={homeName} awayName={awayName} homeScore={match.home_score==null?null:Number(match.home_score)} awayScore={match.away_score==null?null:Number(match.away_score)} finished={done}/>
     <div className="match-analysis-grid">
       {statPeriods.length>0&&<MatchStats periods={statPeriods} homeId={String(match.canonical_home_team_id)} awayId={String(match.canonical_away_team_id)} homeName={homeName} awayName={awayName}/>}
       <MatchTimeline events={events} homeId={String(match.canonical_home_team_id)} awayId={String(match.canonical_away_team_id)} homeName={homeName} awayName={awayName}/>
@@ -117,10 +144,10 @@ export default function MatchDetailPage({match,events,lineups,statPeriods,odds,o
 }
 
 export const getServerSideProps:GetServerSideProps<MatchPageProps>=async({params})=>{
-  const [{gold,teamsMap},{match:getMatch}]=await Promise.all([import('../../lib/data/gold'),import('../../lib/data/queries')]);
+  const [{gold,teamsMap},{match:getMatch,scorePredictions:getScorePredictions}]=await Promise.all([import('../../lib/data/gold'),import('../../lib/data/queries')]);
   const id=String(params?.matchId||'');
   const match=getMatch(id);
-  if(!match)return {props:{match:null,events:[],lineups:[],statPeriods:[],odds:[],oddsCapturedAt:null,preKickoffOdds:0}};
+  if(!match)return {props:{match:null,events:[],lineups:[],statPeriods:[],predictions:{homeExpectedGoals:0,awayExpectedGoals:0,scores:[]},odds:[],oddsCapturedAt:null,preKickoffOdds:0}};
   const players=new Map(gold('players').map(player=>[String(player.canonical_player_id),player]));
   const teamMap=teamsMap();
   const playerName=(playerId:unknown)=>String(players.get(String(playerId))?.name||'Jogador');
@@ -150,5 +177,6 @@ export const getServerSideProps:GetServerSideProps<MatchPageProps>=async({params
   const kickoff=Date.parse(String(match.kickoff_utc||match.kickoff_date||''));
   const preKickoffOdds=Number.isFinite(kickoff)?rawOdds.filter(row=>Date.parse(String(row.collected_at))<=kickoff).length:0;
   const oddsCapturedAt=rawOdds.map(row=>String(row.collected_at||'')).sort().at(-1)||null;
-  return {props:{match,events,lineups,statPeriods,odds,oddsCapturedAt,preKickoffOdds}};
+  const predictions=getScorePredictions(id);
+  return {props:{match,events,lineups,statPeriods,predictions,odds,oddsCapturedAt,preKickoffOdds}};
 };

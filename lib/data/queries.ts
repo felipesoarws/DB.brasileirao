@@ -139,6 +139,52 @@ export function seasonRoundLeaders(s:string){
   });
 }
 
+export type ScorePrediction={homeGoals:number;awayGoals:number;probability:number};
+export type MatchScoreForecast={homeExpectedGoals:number;awayExpectedGoals:number;scores:ScorePrediction[]};
+
+export function scorePredictions(matchId:string):MatchScoreForecast{
+  const allMatches=gold('matches'),target=allMatches.find(row=>String(row.canonical_match_id)===matchId);
+  if(!target)return {homeExpectedGoals:0,awayExpectedGoals:0,scores:[]};
+  const season=Number(target.season),round=Number(target.round),targetTime=Date.parse(String(target.kickoff_utc||target.kickoff_date||''));
+  const dateOnly=target.kickoff_precision==='date'||!target.kickoff_utc;
+  const eligible=allMatches.filter(row=>{
+    if(String(row.canonical_match_id)===matchId||!isFinished(row)||row.home_score==null||row.away_score==null)return false;
+    const rowSeason=Number(row.season),rowRound=Number(row.round),rowTime=Date.parse(String(row.kickoff_utc||row.kickoff_date||''));
+    if(Number.isFinite(targetTime)&&!dateOnly&&Number.isFinite(rowTime))return rowTime<targetTime;
+    if(Number.isFinite(rowSeason)&&Number.isFinite(season)&&rowSeason!==season)return rowSeason<season;
+    return Number.isFinite(rowRound)&&Number.isFinite(round)&&rowRound<round;
+  }).sort((a,b)=>Number(a.season)-Number(b.season)||Number(a.round)-Number(b.round)||Date.parse(String(a.kickoff_utc||a.kickoff_date||''))-Date.parse(String(b.kickoff_utc||b.kickoff_date||'')));
+
+  const homeId=String(target.canonical_home_team_id),awayId=String(target.canonical_away_team_id);
+  const recent=(teamId:string)=>eligible.filter(row=>String(row.canonical_home_team_id)===teamId||String(row.canonical_away_team_id)===teamId).slice(-8);
+  const asHome=eligible.filter(row=>String(row.canonical_home_team_id)===homeId).slice(-8);
+  const asAway=eligible.filter(row=>String(row.canonical_away_team_id)===awayId).slice(-8);
+  const homeRecent=recent(homeId),awayRecent=recent(awayId);
+  const goalsFor=(row:Row,teamId:string)=>Number(String(row.canonical_home_team_id)===teamId?row.home_score:row.away_score)||0;
+  const goalsAgainst=(row:Row,teamId:string)=>Number(String(row.canonical_home_team_id)===teamId?row.away_score:row.home_score)||0;
+  const estimate=(rows:Row[],value:(row:Row)=>number,fallback:number)=>{
+    const weighted=rows.reduce((acc,row,index)=>{const weight=Math.pow(.82,rows.length-index-1);return {sum:acc.sum+value(row)*weight,weight:acc.weight+weight};},{sum:0,weight:0});
+    return weighted.weight?weighted.sum/weighted.weight:fallback;
+  };
+  const homeRecentFor=estimate(homeRecent,row=>goalsFor(row,homeId),0),homeRecentAgainst=estimate(homeRecent,row=>goalsAgainst(row,homeId),0);
+  const awayRecentFor=estimate(awayRecent,row=>goalsFor(row,awayId),0),awayRecentAgainst=estimate(awayRecent,row=>goalsAgainst(row,awayId),0);
+  const homeVenueFor=estimate(asHome,row=>Number(row.home_score)||0,homeRecentFor),homeVenueAgainst=estimate(asHome,row=>Number(row.away_score)||0,homeRecentAgainst);
+  const awayVenueFor=estimate(asAway,row=>Number(row.away_score)||0,awayRecentFor),awayVenueAgainst=estimate(asAway,row=>Number(row.home_score)||0,awayRecentAgainst);
+  const homeAttack=.58*homeRecentFor+.42*homeVenueFor;
+  const homeDefense=.58*homeRecentAgainst+.42*homeVenueAgainst;
+  const awayAttack=.58*awayRecentFor+.42*awayVenueFor;
+  const awayDefense=.58*awayRecentAgainst+.42*awayVenueAgainst;
+  let expectedHome=(homeAttack+awayDefense)/2;
+  let expectedAway=(awayAttack+homeDefense)/2;
+  expectedHome=Math.max(.25,Math.min(4.2,expectedHome));
+  expectedAway=Math.max(.25,Math.min(4.2,expectedAway));
+  const factorial=(n:number)=>n<2?1:n*factorial(n-1);
+  const poisson=(goals:number,expected:number)=>Math.exp(-expected)*Math.pow(expected,goals)/factorial(goals);
+  const scores:ScorePrediction[]=Array.from({length:11},(_,homeGoals)=>Array.from({length:11},(_,awayGoals)=>({homeGoals,awayGoals,probability:poisson(homeGoals,expectedHome)*poisson(awayGoals,expectedAway)})))
+    .flat().sort((a,b)=>b.probability-a.probability).slice(0,5);
+  return {homeExpectedGoals:expectedHome,awayExpectedGoals:expectedAway,scores};
+}
+
 export const related = (name:string,id:string) => by(gold(name),'canonical_match_id',id);
 
 export function dashboard() {
