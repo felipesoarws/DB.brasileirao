@@ -7,6 +7,9 @@ const tableFiles=(...tables)=>[
 module.exports = {
   reactStrictMode: true,
   poweredByHeader: false,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
   async headers() {
     const scriptPolicy = process.env.NODE_ENV === 'production' ? "script-src 'self'" : "script-src 'self' 'unsafe-eval'";
     const httpsUpgradePolicy = process.env.NODE_ENV === 'production' ? '; upgrade-insecure-requests' : '';
