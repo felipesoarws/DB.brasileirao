@@ -2,7 +2,7 @@ import {GetServerSideProps} from 'next';
 import Link from 'next/link';
 import {useEffect,useState} from 'react';
 import {useRouter} from 'next/router';
-import {seasonAnalytics,seasonMatches,standings,venueStandings} from '../../lib/data/queries';
+import {seasonAnalytics,seasonMatches,seasonRoundLeaders,standings,venueStandings} from '../../lib/data/queries';
 import {Header,Kpis,MatchTable,StandingsScope,StandingsTable,Team} from '../../components/ui';
 
 type Match=Record<string,any>;
@@ -84,7 +84,14 @@ function ClubMatchStatistics({rows}:{rows:any[]}){
   return <div className="club-match-statistics card"><div className="club-statistics-toolbar"><div><h3>Comparativo entre clubes</h3><p className="caption">Média por partida. A amostra pode variar por time e indicador.</p></div><label>Indicador<select value={selectedMetric} onChange={event=>setMetric(event.target.value)}>{availableMetrics.map(key=><option value={key} key={key}>{clubStatLabels[key]||key}</option>)}</select></label></div><div className="table-wrap club-match-stat-table"><table><colgroup><col/><col/><col/><col/><col/><col/></colgroup><thead><tr><th>#</th><th>Clube</th><th>Média / jogo</th><th>Mediana</th><th>Faixa</th><th className="right">Amostra</th></tr></thead><tbody>{metricRows.map((row,index)=><tr key={row.canonical_team_id}><td className="caption numeric">{index+1}</td><td><Team id={row.canonical_team_id} name={row.team_name} color={row.team?.color}/></td><td><div className="club-stat-average"><strong className="numeric">{format(row.average)}</strong><span className="club-stat-track"><i style={{width:`${Math.max(2,Number(row.average)/maxAverage*100)}%`}}/></span></div></td><td className="numeric">{format(row.median)}</td><td className="numeric">{format(row.minimum)}–{format(row.maximum)}</td><td className="right numeric">{row.matches} <span className="caption">jogos</span></td></tr>)}</tbody></table></div></div>;
 }
 
-export default function Season({season,table,tableHome,tableAway,matches,tab,round,rounds,analytics}:any){
+function RoundLeaders({season,rows,preview=false}:{season:string;rows:any[];preview?:boolean}){
+  const visible=preview?rows.slice(0,5):rows;
+  return <section className="section round-leaders-panel card"><div className="statistics-section-heading"><span className="statistics-section-icon">♛</span><div><h2>Líderes por rodada</h2><p className="caption">Clubes que terminaram cada rodada na liderança da classificação.</p></div>{preview&&<Link className="round-leaders-all" href={`/temporadas/${season}?tab=lideres`}>Ver todas as rodadas →</Link>}</div>
+    {visible.length?<div className="table-wrap round-leaders-table"><table><thead><tr><th>Rodada</th><th>Clube líder</th><th className="right">PTS</th><th>Campanha (V–E–D)</th><th className="right">SG</th></tr></thead><tbody>{visible.map((row:any)=><tr key={row.round}><td><strong>Rodada {row.round}</strong></td>{row.leaders.length?<><td><div className="round-leader-list">{row.leaders.map((leader:any)=><Team key={leader.teamId} id={leader.teamId} name={leader.teamName} color={leader.teamColor}/>)}</div></td><td className="right numeric"><div className="round-leader-list">{row.leaders.map((leader:any)=><strong key={leader.teamId}>{leader.points}</strong>)}</div></td><td><div className="round-leader-list">{row.leaders.map((leader:any)=><span className="numeric" key={leader.teamId}>{leader.wins}–{leader.draws}–{leader.losses}</span>)}</div></td><td className="right numeric"><div className="round-leader-list">{row.leaders.map((leader:any)=><strong key={leader.teamId}>{leader.goalDifference>0?`+${leader.goalDifference}`:leader.goalDifference}</strong>)}</div></td></>:<><td className="caption">Não definido</td><td className="right">—</td><td>—</td><td className="right">—</td></>}</tr>)}</tbody></table></div>:<div className="empty">Não há classificação por rodada publicada para esta temporada.</div>}
+  </section>;
+}
+
+export default function Season({season,table,tableHome,tableAway,matches,tab,round,rounds,analytics,roundLeaders}:any){
   const router=useRouter();
   const [scope,setScope]=useState<'total'|'home'|'away'>('total');
   const [selectedRound,setSelectedRound]=useState<number>(round);
@@ -98,15 +105,17 @@ export default function Season({season,table,tableHome,tableAway,matches,tab,rou
     if(queryScope==='total'||queryScope==='home'||queryScope==='away')setScope(queryScope);
   },[router.query.scope]);
   const visibleTable=scope==='home'?tableHome:scope==='away'?tableAway:table;
-  const tabs=[['overview','Visão geral'],['classificacao','Classificação'],['rodadas','Rodadas'],['estatisticas','Estatísticas'],['artilharia','Artilharia']];
+  const tabs=[['overview','Visão geral'],['classificacao','Classificação'],['rodadas','Rodadas'],['estatisticas','Estatísticas'],['artilharia','Artilharia'],['lideres','Líderes por rodada']];
   const visibleMatches=matches.filter((m:Match)=>Number(m.round)===Number(selectedRound));
   const showsRound=tab==='rodadas'||tab==='partidas'||!tab||tab==='overview';
   return <>
     <Header title={`Brasileirão ${season}`} desc="Dados canônicos publicados para a temporada."/>
     <nav className="tabs">{tabs.map(([v,l])=><Link className={(tab||'overview')===v?'active':''} href={`/temporadas/${season}${v==='overview'?'':`?tab=${v}`}`} key={v}>{l}</Link>)}</nav>
-    {tab!=='estatisticas'&&tab!=='artilharia'&&<Kpis items={[{label:'Partidas',value:matches.length},{label:'Clubes',value:table.length},{label:'Finalizadas',value:matches.filter((m:Match)=>isFinished(m)).length},{label:'Rodadas',value:rounds.length}]}/>}
+    {tab!=='estatisticas'&&tab!=='artilharia'&&tab!=='lideres'&&<Kpis items={[{label:'Partidas',value:matches.length},{label:'Clubes',value:table.length},{label:'Finalizadas',value:matches.filter((m:Match)=>isFinished(m)).length},{label:'Rodadas',value:rounds.length}]}/>}
     {(tab==='classificacao'||!tab||tab==='overview')&&<section className="section"><div className="season-classification-heading"><h2>Classificação</h2><StandingsScope value={scope} onChange={setScope}/></div><StandingsTable rows={visibleTable}/></section>}
     {showsRound&&<section className="section"><div className="season-round-heading"><h2>Partidas da rodada</h2><RoundNavigation season={season} round={selectedRound} rounds={rounds} tab={tab} onRoundChange={setSelectedRound}/></div><MatchTable matches={visibleMatches}/></section>}
+    {(!tab||tab==='overview')&&<RoundLeaders season={season} rows={roundLeaders} preview/>}
+    {tab==='lideres'&&<RoundLeaders season={season} rows={roundLeaders}/>}
     {tab==='estatisticas'&&<>
       <section className="section season-statistics"><div className="statistics-section-heading"><span className="statistics-section-icon">◉</span><div><h2>Panorama de gols</h2><p className="caption">Resumo da temporada até as partidas finalizadas disponíveis.</p></div></div>{analytics?.stats?<><Kpis items={[{label:'Partidas finalizadas',value:analytics.stats.matches},{label:'Gols marcados',value:analytics.stats.totalGoals},{label:'Média de gols por jogo',value:analytics.stats.goalsPerMatch.toFixed(1)},{label:'Gols de mandantes',value:analytics.stats.homeGoals},{label:'Gols de visitantes',value:analytics.stats.awayGoals}]}/><div className="season-stat-grid">{[
         {label:'Mais de 1,5 gols',short:'1,5+',detail:'2 ou mais gols na partida',value:analytics.stats.over15},
@@ -140,5 +149,6 @@ export const getServerSideProps:GetServerSideProps=async({params,query})=>{
   const table=standings(season);
   const activeTab=Array.isArray(query.tab)?query.tab[0]:query.tab;
   const analytics=activeTab==='estatisticas'||activeTab==='artilharia'?seasonAnalytics(season):null;
-  return {props:{season,table,tableHome:venueStandings(season,'home',table),tableAway:venueStandings(season,'away',table),matches,tab:activeTab||null,round,rounds,analytics}};
+  const roundLeaders=activeTab==='lideres'||!activeTab||activeTab==='overview'?seasonRoundLeaders(season):[];
+  return {props:{season,table,tableHome:venueStandings(season,'home',table),tableAway:venueStandings(season,'away',table),matches,tab:activeTab||null,round,rounds,analytics,roundLeaders}};
 };

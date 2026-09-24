@@ -46,6 +46,7 @@ function MatchStats({periods,homeId,awayId,homeName,awayName}:{periods:StatPerio
   const statColumns=[['attack','defense'],['possession','discipline']];
   return <section className="match-detail-section card match-stats-section"><div className="match-section-heading"><div><span className="match-section-kicker">COMPARATIVO</span><h2>Estatísticas da partida</h2></div></div>
     <div className="match-stat-tabs" role="tablist" aria-label="Período das estatísticas">{available.map(item=><button type="button" role="tab" aria-selected={activeKey===item.key} className={activeKey===item.key?'is-active':''} key={item.key} onClick={()=>setActiveKey(item.key)}>{item.key==='summary'?'Jogo':item.label}</button>)}</div>
+    <div className="match-stat-panel tab-content-transition" key={activeKey}>
     <div className="match-stat-legend"><span><img src={`/api/team-logo/${encodeURIComponent(homeId)}`} alt=""/>{homeName}</span><span><img src={`/api/team-logo/${encodeURIComponent(awayId)}`} alt=""/>{awayName}</span></div>
     <div className="match-stat-columns" role="tabpanel">{statColumns.map((column,index)=><div className="match-stat-column" key={`stats-column-${index}`}>
       {column.map(categoryKey=>{
@@ -59,6 +60,7 @@ function MatchStats({periods,homeId,awayId,homeName,awayName}:{periods:StatPerio
         })}</section>;
       })}
     </div>)}</div>
+    </div>
   </section>;
 }
 
@@ -90,11 +92,12 @@ function OddsPanel({odds,oddsCapturedAt,preKickoffOdds}:{odds:MatchOdd[];oddsCap
 export default function MatchDetailPage({match,events,lineups,statPeriods,odds,oddsCapturedAt,preKickoffOdds}:MatchPageProps){
   if(!match)return <><Header title="Partida não encontrada"/><div className="empty">A partida solicitada não está publicada na Gold.</div></>;
   const done=['finished','final','ft','status_final'].includes(String(match.status).toLowerCase()),homeName=String(match.canonical_home_team_name||match.home?.name||'Mandante'),awayName=String(match.canonical_away_team_name||match.away?.name||'Visitante'),competitionName=String(match.competition||'').toUpperCase()==='BRA_SERIE_A'?'Brasileirão':String(match.competition||'Brasileirão');
+  const browserTitle=`${homeName} x ${awayName} — Rodada ${match.round??'—'} — Brasileirão ${match.season}`;
   const dateValue=match.kickoff_utc||match.kickoff_date;
   const matchDate=dateValue?new Date(dateValue).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'long',year:'numeric'}):'Data a definir';
   const matchTime=dateValue&&match.kickoff_precision!=='date'?new Date(dateValue).toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}):null;
   return <div className="match-detail-page">
-    <Header title={done?'Detalhe da partida':'Prévia da partida'} desc={`${competitionName} ${match.season} · Rodada ${match.round??'—'}`} meta={`Partida ${match.canonical_match_id}`}/>
+    <Header title={done?'Detalhe da partida':'Prévia da partida'} browserTitle={browserTitle} desc={`${competitionName} ${match.season} · Rodada ${match.round??'—'}`} meta={`Partida ${match.canonical_match_id}`}/>
     <section className="match-detail-hero card" aria-label="Placar e informações da partida">
       <div className="match-detail-topline"><span>{competitionName} <i/> Temporada {match.season} <i/> Rodada {match.round??'—'}</span><Status status={match.status}/></div>
       <div className="match-detail-scoreline"><Team id={String(match.canonical_home_team_id)} name={homeName} color={match.home?.color}/><div className="match-score-center"><strong className="numeric">{done&&match.home_score!=null?`${match.home_score} — ${match.away_score}`:'—'}</strong>{done&&match.home_score_ht!=null&&match.away_score_ht!=null&&<span>Intervalo {match.home_score_ht} — {match.away_score_ht}</span>}</div><Team reverse id={String(match.canonical_away_team_id)} name={awayName} color={match.away?.color}/></div>
@@ -109,7 +112,6 @@ export default function MatchDetailPage({match,events,lineups,statPeriods,odds,o
     {lineups.length>0&&<section className="match-detail-section"><div className="match-section-heading"><div><span className="match-section-kicker">FICHA TÉCNICA</span><h2>Escalações</h2></div></div><div className="match-lineup-grid">{lineups.map(team=><article className="match-lineup-card card" key={team.id}><h3><Team id={team.id} name={team.name} color={team.color}/></h3><div className="match-lineup-subheading"><span>Titulares</span><span>{team.starters.length}</span></div><ol className="match-player-list">{team.starters.map(player=><li key={player.id}><span className="match-player-number">{player.shirtNumber??'—'}</span><strong>{player.name}</strong><small>{player.position?(positionLabels[player.position.replaceAll('-','_')]||player.position):'—'}</small></li>)}</ol><div className="match-lineup-subheading match-bench-heading"><span>Reservas relacionados</span><span>{team.reserves.length}</span></div><ol className="match-player-list match-reserve-list">{team.reserves.map(player=><li key={player.id}><span className="match-player-number">{player.shirtNumber??'—'}</span><strong>{player.name}</strong><small>{player.position?(positionLabels[player.position.replaceAll('-','_')]||player.position):'—'}</small></li>)}</ol></article>)}</div></section>}
 
     <OddsPanel odds={odds} oddsCapturedAt={oddsCapturedAt} preKickoffOdds={preKickoffOdds}/>
-    <p className="match-detail-source-note">Dados da Gold · {Array.isArray(match.sources)?match.sources.join(' + '):'Fontes registradas'} · {match.sources_count??0} fontes</p>
   </div>;
 }
 

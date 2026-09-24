@@ -2,6 +2,7 @@ import type {GetServerSideProps} from 'next';
 import Link from 'next/link';
 import {gold,isFinished,latestSeason,seasons,type Row} from '../../lib/data/gold';
 import {Header,Kpis,MatchTable} from '../../components/ui';
+import StyledSelect from '../../components/StyledSelect';
 
 type MatchFilters={season:string;status:string;round:string;team:string};
 type MatchPageProps={rows:Row[];seasons:string[];rounds:string[];filters:MatchFilters;page:number;pageCount:number;total:number;seasonStats:{matches:number;finished:number;goals:number}};
@@ -21,9 +22,9 @@ export default function MatchesPage({rows,seasons:availableSeasons,rounds,filter
       {label:'Gols marcados',value:seasonStats.goals.toLocaleString('pt-BR')},
     ]}/>
     <form className="match-filters card" method="get" action="/partidas">
-      <label><span>Temporada</span><select name="season" defaultValue={filters.season}>{availableSeasons.map(season=><option key={season} value={season}>{season}</option>)}</select></label>
-      <label><span>Situação</span><select name="status" defaultValue={filters.status}><option value="all">Todas</option><option value="finished">Finalizadas</option><option value="upcoming">Agendadas</option><option value="postponed">Adiada</option></select></label>
-      <label><span>Rodada</span><select name="round" defaultValue={filters.round}><option value="all">Todas</option>{rounds.map(round=><option key={round} value={round}>Rodada {round}</option>)}</select></label>
+      <StyledSelect name="season" label="Temporada" value={filters.season} options={availableSeasons.map(season=>({value:season,label:season}))}/>
+      <StyledSelect name="status" label="Situação" value={filters.status} options={[{value:'all',label:'Todas'},{value:'finished',label:'Finalizadas'},{value:'upcoming',label:'Agendadas'},{value:'postponed',label:'Adiada'}]}/>
+      <StyledSelect name="round" label="Rodada" value={filters.round} options={[{value:'all',label:'Todas'},...rounds.map(round=>({value:round,label:`Rodada ${round}`}))]}/>
       <label className="match-filter-team"><span>Clube</span><input type="search" name="team" placeholder="Buscar mandante ou visitante" defaultValue={filters.team}/></label>
       <button className="btn primary" type="submit">Filtrar partidas</button>
       <Link className="match-filter-reset" href="/partidas">Limpar filtros</Link>

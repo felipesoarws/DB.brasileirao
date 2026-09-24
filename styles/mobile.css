@@ -217,6 +217,7 @@
 
 .match-filters{display:grid;grid-template-columns:minmax(110px,.7fr) minmax(125px,.8fr) minmax(125px,.8fr) minmax(190px,1.4fr) auto auto;align-items:end;gap:10px;margin:22px 0 24px;padding:14px}
 .match-filters label{display:grid;gap:5px;min-width:0;color:var(--muted);font-size:10px;line-height:14px}
+.match-filters>.styled-select{gap:5px;font-size:10px;line-height:14px}
 .match-filters select,.match-filters input{width:100%;height:36px;min-width:0;padding:0 9px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:var(--text);font-size:11px;outline:none}
 .match-filters select:focus,.match-filters input:focus{border-color:#a8c9b3;box-shadow:0 0 0 3px rgba(8,122,70,.08)}
 .match-filters .btn{height:36px;white-space:nowrap}
@@ -256,3 +257,11 @@
 @media(max-width:680px){.season-classification-heading{align-items:flex-start;flex-wrap:wrap}.season-classification-scope{margin-left:auto}}
 @media(max-width:380px){.season-classification-scope button{padding:0 8px}}
 @media(prefers-reduced-motion:reduce){.club-directory-results{animation:none}}
+.round-leaders-panel>.statistics-section-heading{align-items:center}
+.round-leaders-all{flex:none;margin-left:auto;color:#087a46;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap}
+.round-leaders-all:hover{text-decoration:underline}
+.round-leaders-table th:first-child,.round-leaders-table td:first-child{width:105px;white-space:nowrap}
+.round-leader-list{display:grid;gap:7px}
+.round-leader-list>.team{gap:7px;font-size:12px}
+.round-leader-list .club-mark{width:24px;height:24px;background:transparent}
+@media(max-width:680px){.round-leaders-panel>.statistics-section-heading{align-items:flex-start;flex-wrap:wrap}.round-leaders-all{margin-left:0}}

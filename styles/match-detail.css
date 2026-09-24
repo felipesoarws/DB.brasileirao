@@ -6,7 +6,7 @@
 .match-detail-topline i{width:3px;height:3px;border-radius:50%;background:#aab5ae}
 .match-detail-scoreline{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:24px;max-width:780px;margin:23px auto 25px}
 .match-detail-scoreline>.team{display:flex;flex-direction:column;justify-self:center;align-items:center;gap:10px;width:100%;text-align:center}
-.match-detail-scoreline>.team-reverse{justify-content:center}
+.match-detail-scoreline>.team-reverse{justify-content:center;flex-direction:column-reverse}
 .match-detail-scoreline .club-mark{width:72px;height:72px;border:0;border-radius:0;background:transparent}
 .match-detail-scoreline .club-mark img{padding:0;background:transparent}
 .match-detail-scoreline .team-name{font-size:16px;font-weight:650}
@@ -96,7 +96,6 @@
 .match-odd-market h3 span{color:#66736b;font-weight:500}
 .match-odd-market p{display:flex;justify-content:space-between;gap:10px;margin:0;padding-top:4px;color:var(--muted);font-size:11px;line-height:15px}
 .match-odd-market p strong{color:#202622;font-size:12px;font-variant-numeric:tabular-nums;font-weight:600}
-.match-detail-source-note{margin:0;color:#8a958e;text-align:right;font-size:9px;line-height:14px}
 @media(max-width:1080px){.match-analysis-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.match-analysis-grid>.match-detail-section[aria-labelledby="match-timeline-title"]{grid-column:1/-1;grid-row:1}.match-stats-section{grid-column:1/-1;grid-row:2}.match-stat-columns{gap:32px}}
 @media(max-width:900px){.match-detail-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.match-detail-facts>span:nth-child(2){border-right:0}.match-detail-facts>span:nth-child(n+3){border-top:1px solid #e7eee9}.match-detail-facts.is-without-attendance{grid-template-columns:repeat(3,minmax(0,1fr))}.match-detail-facts.is-without-attendance>span:nth-child(n+3){border-top:0}}
 @media(max-width:680px){.match-detail-page{gap:13px}.match-detail-hero{padding:16px 15px 0}.match-detail-topline{align-items:flex-start}.match-detail-topline>span:first-child{gap:5px}.match-detail-scoreline{gap:8px;margin:19px auto 20px}.match-detail-scoreline .club-mark{width:48px;height:48px}.match-detail-scoreline .team-name{max-width:120px;font-size:12px}.match-score-center>strong{font-size:28px;line-height:36px}.match-score-center>span{font-size:9px}.match-detail-facts>span{min-height:56px;padding:8px}.match-detail-section{padding:15px}.match-section-heading{align-items:flex-start}.match-section-heading h2{font-size:16px}.match-stat-columns{grid-template-columns:1fr;gap:10px}.match-stat-values{grid-template-columns:minmax(45px,1fr) minmax(0,2fr) minmax(45px,1fr);gap:5px;font-size:12px}.match-stat-tabs button{min-width:0;flex:1;padding:8px 7px}.match-lineup-grid{grid-template-columns:1fr;gap:10px}.match-player-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 8px}.match-odds-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.match-analysis-grid{grid-template-columns:minmax(0,1fr)}.match-stats-section,.match-analysis-grid>.match-detail-section[aria-labelledby="match-timeline-title"]{grid-column:1;grid-row:auto}}

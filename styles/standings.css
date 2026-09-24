@@ -11,6 +11,35 @@
 .standings-table td:nth-child(3) {
   text-align: center;
 }
+.standings-table tbody tr.standings-row-g4 td {
+  background: #f1f8f3;
+}
+.standings-table tbody tr.standings-row-g4 td:first-child {
+  box-shadow: inset 3px 0 #16804a;
+  color: #087a46;
+  font-weight: 700;
+}
+.standings-table tbody tr.standings-row-z4 td {
+  background: #fff5f4;
+}
+.standings-table tbody tr.standings-row-z4 td:first-child {
+  box-shadow: inset 3px 0 #d14545;
+  color: #b42318;
+  font-weight: 700;
+}
+.standings-zone-label {
+  display: block;
+  font-size: 8px;
+  line-height: 8px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.standings-zone-g4 {
+  color: #087a46;
+}
+.standings-zone-z4 {
+  color: #b42318;
+}
 .form-results {
   display: flex;
   align-items: center;

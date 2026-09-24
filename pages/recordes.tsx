@@ -114,7 +114,7 @@ function MatchRecordCard({
                   src={
                     record.homeId
                       ? `/api/team-logo/${encodeURIComponent(record.homeId)}`
-                      : "/favicon.png"
+                      : "/favicon.png?v=20260923"
                   }
                   alt=""
                 />
@@ -122,7 +122,7 @@ function MatchRecordCard({
                   src={
                     record.awayId
                       ? `/api/team-logo/${encodeURIComponent(record.awayId)}`
-                      : "/favicon.png"
+                      : "/favicon.png?v=20260923"
                   }
                   alt=""
                 />
@@ -287,6 +287,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       Number(row.season) < Number(latestSeason()) && Number(row.played) > 0,
   );
   const goalDifferences = new Map<string, number>();
+  const goalsConcededBySeason = new Map<string, number>();
   for (const match of gold("matches")) {
     if (
       Number(match.season) >= Number(latestSeason()) ||
@@ -308,6 +309,16 @@ export const getServerSideProps: GetServerSideProps = async () => {
     goalDifferences.set(
       awayKey,
       (goalDifferences.get(awayKey) || 0) - difference,
+    );
+    const homeConcededKey = `${season}:${homeId}`;
+    const awayConcededKey = `${season}:${awayId}`;
+    goalsConcededBySeason.set(
+      homeConcededKey,
+      (goalsConcededBySeason.get(homeConcededKey) || 0) + Number(match.away_score),
+    );
+    goalsConcededBySeason.set(
+      awayConcededKey,
+      (goalsConcededBySeason.get(awayConcededKey) || 0) + Number(match.home_score),
     );
   }
   const decorateLeader = (
@@ -349,6 +360,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
         value:
           field === "goal_difference"
             ? (matchBasedDifference ?? aggregateDifference)
+            : field === "goals_against"
+              ? (goalsConcededBySeason.get(`${season}:${teamId}`) ?? Number(row.goals_against ?? row.goals_conceded ?? row.ga ?? row.conceded ?? 0))
             : Number(row[field]) || 0,
       };
     });
@@ -428,6 +441,20 @@ export const getServerSideProps: GetServerSideProps = async () => {
       "gf",
       "min",
       "gols marcados",
+    ),
+    extrema(
+      "most-goals-against",
+      "Mais gols sofridos",
+      "goals_against",
+      "max",
+      "gols sofridos",
+    ),
+    extrema(
+      "fewest-goals-against",
+      "Menos gols sofridos",
+      "goals_against",
+      "min",
+      "gols sofridos",
     ),
     extrema(
       "best-goal-difference",

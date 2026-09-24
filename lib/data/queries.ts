@@ -118,6 +118,27 @@ export function seasonAnalytics(s:string){
   return {stats:stats?{matches:Number(stats.matches)||0,homeGoals:Number(stats.home_goals)||0,awayGoals:Number(stats.away_goals)||0,totalGoals:Number(stats.total_goals)||0,goalsPerMatch:Number(stats.goals_per_match)||0,over15:Number(stats.over_1_5)||0,over25:Number(stats.over_2_5)||0,over35:Number(stats.over_3_5)||0,bothScored:Number(stats.both_teams_scored)||0,cleanSheets:Number(stats.clean_sheet_matches)||0}:null,roundGoals,clubPerformance,clubMatchStats,scorers:top('goals'),assists:top('assists')};
 }
 
+export function seasonRoundLeaders(s:string){
+  const clubs=teamsMap();
+  const seasonMatches=gold('matches').filter(row=>String(row.season)===s),matchesByRound=new Map<number,Row[]>();
+  for(const match of seasonMatches){const round=Number(match.round);if(!Number.isFinite(round))continue;const roundMatches=matchesByRound.get(round)||[];roundMatches.push(match);matchesByRound.set(round,roundMatches);}
+  const startedRounds=new Set([...matchesByRound.entries()].filter(([,rows])=>rows.some(row=>isFinished(row)||/live|progress|halftime|first_half|second_half/i.test(String(row.status)))).map(([round])=>round));
+  const byRound=new Map<number,Row[]>();
+  for(const row of gold('standings_by_round')){
+    if(String(row.season)!==s)continue;
+    const round=Number(row.round);
+    if(!Number.isFinite(round))continue;
+    const rows=byRound.get(round)||[];rows.push(row);byRound.set(round,rows);
+  }
+  return [...byRound.entries()].sort(([a],[b])=>b-a).map(([round,rows])=>{
+    const leaders=startedRounds.has(round)?rows.filter(row=>Number(row.position)===1):[],points=Math.max(0,...leaders.map(row=>Number(row.points)||0));
+    return {round,leaders:leaders.map(row=>{
+      const teamId=String(row.canonical_team_id||row.team_id),club=clubs.get(teamId);
+      return {teamId,teamName:String(club?.canonical_team_name||club?.name||teamId),teamColor:club?.color||null,points:Number(row.points)||points,played:Number(row.played)||0,wins:Number(row.won??row.wins)||0,draws:Number(row.drawn??row.draws)||0,losses:Number(row.lost??row.losses)||0,goalDifference:(Number(row.gf??row.goals_for)||0)-(Number(row.ga??row.goals_against)||0)};
+    })};
+  });
+}
+
 export const related = (name:string,id:string) => by(gold(name),'canonical_match_id',id);
 
 export function dashboard() {

@@ -1,15 +1,15 @@
 import Institutional from '../components/Institutional';
 
-const Section=({title,children}:{title:string;children:React.ReactNode})=><section className="section"><h2>{title}</h2><p className="desc">{children}</p></section>;
+function Section({title,children}:{title:string;children:React.ReactNode}){return <section className="section"><h2>{title}</h2><p className="desc">{children}</p></section>}
 
 export default function Privacy(){
-  return <Institutional title="Privacidade" desc="Como o Brasileirão Database trata informações ao navegar pelo site.">
+  return <Institutional title="Privacidade" desc="Como o BR.database lida com informações durante a navegação.">
     <p className="caption">Última atualização: 23 de setembro de 2026</p>
-    <Section title="Quem mantém este projeto">O Brasileirão Database é um projeto independente, sem vínculo oficial com a CBF, os clubes ou os fornecedores de dados e serviços mencionados no site.</Section>
-    <Section title="Informações tratadas pelo site">O site não oferece cadastro ou login, não solicita dados pessoais em formulários e não tem ferramenta de analytics ou publicidade configurada no código da aplicação. A infraestrutura que hospeda o site pode processar dados técnicos de acesso para operação e segurança; os registros e prazos dependem da configuração do provedor de hospedagem e não são definidos por esta aplicação.</Section>
-    <Section title="Preferência salva no navegador">O aviso de preferências grava somente a escolha “aceita” ou “recusada” no armazenamento local do navegador, na chave <code>brdb-cookie</code>, para não exibir o aviso novamente. Isso é armazenamento local, não um cookie HTTP. A escolha pode ser alterada ou removida na página <a href="/cookies">Cookies</a>; limpar os dados do navegador também a remove.</Section>
-    <Section title="Emblemas e serviços externos">Os emblemas dos clubes são carregados por uma rota deste site, que busca as imagens no CDN da ESPN. Ao solicitar uma imagem, a infraestrutura do site e o serviço de origem podem receber dados técnicos da requisição. Links para LinkedIn, GitHub e outros sites abrem serviços de terceiros, sujeitos às políticas próprias desses serviços.</Section>
-    <Section title="Seus direitos e contato">Quando houver tratamento de dados pessoais sujeito à legislação aplicável, pedidos relacionados a confirmação, acesso, correção ou eliminação podem ser encaminhados pelos <a href="https://www.felipesoarws.me/" target="_blank" rel="noreferrer">canais do responsável pelo projeto</a>. A viabilidade de cada pedido depende do tipo de dado e das obrigações legais ou técnicas aplicáveis.</Section>
-    <Section title="Alterações">Esta página pode ser atualizada se o funcionamento do site ou as práticas descritas mudarem. A data acima indica a revisão mais recente do texto.</Section>
+    <Section title="Um site sem cadastro">O BR.database não oferece contas ou login e não solicita dados pessoais em formulários. A aplicação não inclui ferramentas próprias de publicidade ou analytics.</Section>
+    <Section title="Preferência salva no navegador">Para lembrar sua decisão sobre o aviso de preferências, o site armazena localmente no navegador o valor “aceita” ou “recusada”, na chave <code>brdb-cookie</code>. Esse registro não é um cookie HTTP e não é enviado pelo site como dado de perfil. Você pode alterar ou apagar sua escolha na página <a href="/cookies">Cookies</a> ou removendo os dados locais do navegador.</Section>
+    <Section title="Dados técnicos e hospedagem">Como qualquer site, a infraestrutura que entrega as páginas pode processar informações técnicas da conexão para funcionamento, diagnóstico e segurança. A retenção desses registros depende da configuração do serviço de hospedagem.</Section>
+    <Section title="Imagens e links externos">Os emblemas são solicitados por uma rota do próprio site e podem depender de um serviço externo de imagens. Links para LinkedIn, GitHub e outros serviços levam a sites de terceiros, que seguem suas próprias políticas.</Section>
+    <Section title="Seus direitos e contato">Para dúvidas ou solicitações relacionadas à privacidade, <a href="https://www.linkedin.com/in/felipesoarws/" target="_blank" rel="noreferrer">fale comigo pelo LinkedIn</a>. Solicitações serão avaliadas conforme os dados efetivamente tratados e as obrigações aplicáveis.</Section>
+    <Section title="Atualizações desta página">Este texto poderá mudar se as funcionalidades ou práticas do projeto forem alteradas. A data no início indica a revisão mais recente.</Section>
   </Institutional>;
 }
