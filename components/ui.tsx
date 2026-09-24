@@ -12,17 +12,29 @@ const formatDate=(m:Row)=>{
   const options={timeZone:'America/Sao_Paulo'};
   return Number.isNaN(x.getTime())?'TBD':`${x.toLocaleDateString('pt-BR',options)} · ${m.kickoff_precision==='date'?'TBD':x.toLocaleTimeString('pt-BR',{...options,hour:'2-digit',minute:'2-digit'})}`;
 };
+const formatMobileDate=(m:Row)=>{
+  const value=m.kickoff_utc||m.kickoff_date;
+  if(!value)return {date:'TBD',time:''};
+  const date=new Date(value),options={timeZone:'America/Sao_Paulo'};
+  if(Number.isNaN(date.getTime()))return {date:'TBD',time:''};
+  const shortDate=date.toLocaleDateString('pt-BR',{...options,day:'2-digit',month:'2-digit'});
+  const time=m.kickoff_precision==='date'?'':date.toLocaleTimeString('pt-BR',{...options,hour:'2-digit',minute:'2-digit'});
+  return {date:shortDate,time};
+};
 
 export function Header({title,desc,meta,browserTitle}:{title:string,desc?:string,meta?:string,browserTitle?:string}){
-  return <><Head><title>{browserTitle||`${title} — Brasileirão Database`}</title><meta name="description" content={desc||'Base independente para explorar o Brasileirão Série A.'}/></Head><header className="page-head"><div><h1 className="page-title">{title}</h1>{desc&&<p className="desc">{desc}</p>}</div>{meta&&<span className="caption mono">{meta}</span>}</header></>;
+  return <><Head><title>{browserTitle||`${title} — Database`}</title><meta name="description" content={desc||'Base independente para explorar o Brasileirão Série A.'}/></Head><header className="page-head"><div><h1 className="page-title">{title}</h1>{desc&&<p className="desc">{desc}</p>}</div>{meta&&<span className="caption mono">{meta}</span>}</header></>;
 }
 
 export function Team({id,name,color,reverse=false}:{id:string,name:string,color?:string|null,logo?:string|null,reverse?:boolean}){
-  const ini=name.split(' ').map(x=>x[0]).slice(0,2).join('');
+  const displayName=name.trim().replace(/(?:\s*[-–/]\s*|\s+)(?:AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)$/i,'').trim()||name;
+  const words=displayName.split(/\s+/).filter(word=>!['da','de','do','das','dos','e'].includes(word.toLocaleLowerCase('pt-BR')));
+  const ini=words.map(x=>x[0]).slice(0,2).join('');
+  const shortName=words.length>1?words.map(word=>word[0]).join('').toUpperCase():words[0]?.slice(0,3).toUpperCase()||'—';
   const hasTeam=id&&id!=='null'&&id!=='undefined';
-  const mark=<span className="club-mark">{ini}{hasTeam?<img src={`/api/team-logo/${encodeURIComponent(id)}`} alt={`Escudo do ${name}`} loading="lazy" onError={e=>{e.currentTarget.style.display='none'}}/>:null}</span>;
+  const mark=<span className="club-mark">{ini}{hasTeam?<img src={`/api/team-logo/${encodeURIComponent(id)}`} alt={`Escudo do ${displayName}`} loading="lazy" onError={e=>{e.currentTarget.style.display='none'}}/>:null}</span>;
   const teamColor=color&&color.toUpperCase()!=='#FFFFFF'?(color.startsWith('#')?color:`#${color}`):'var(--theme-brand-primary)';
-  return <Link href={hasTeam?`/clubes/${id}`:'#'} aria-disabled={!hasTeam} className={`team ${reverse?'team-reverse':''}`} style={{'--team':teamColor} as any}>{reverse&&<span className="team-name">{name}</span>}{mark}{!reverse&&<span className="team-name">{name}</span>}</Link>;
+  return <Link href={hasTeam?`/clubes/${id}`:'#'} aria-disabled={!hasTeam} aria-label={displayName} className={`team ${reverse?'team-reverse':''}`} style={{'--team':teamColor} as any}>{reverse&&<><span className="team-name">{displayName}</span><span className="team-short-name" aria-hidden="true">{shortName}</span></>}{mark}{!reverse&&<><span className="team-name">{displayName}</span><span className="team-short-name" aria-hidden="true">{shortName}</span></>}</Link>;
 }
 
 export function Status({status}:{status?:string}){
@@ -35,7 +47,7 @@ export function Status({status}:{status?:string}){
 
 export function MatchTable({matches,empty='Nenhuma partida disponível.'}:{matches:Row[],empty?:string}){
   if(!matches.length)return <div className="empty">{empty}</div>;
-  return <div className="table-wrap match-table"><table><colgroup><col/><col/><col/><col/><col/><col/><col/></colgroup><thead><tr><th>Data</th><th className="center">Rodada</th><th className="right">Mandante</th><th className="center">Placar</th><th>Visitante</th><th>Status</th><th>Estádio</th></tr></thead><tbody>{matches.map(m=>{const hs=m.home_score,as=m.away_score;return <tr key={m.canonical_match_id}><td className="caption nowrap">{formatDate(m)}</td><td className="center">{m.round??'—'}</td><td className="right"><Team reverse id={String(m.canonical_home_team_id)} name={m.canonical_home_team_name||'—'} color={m.home?.color} logo={m.home?.logo}/></td><td className="center"><Link href={`/partidas/${m.canonical_match_id}`} className="score-link numeric">{hs!=null&&as!=null?`${hs} — ${as}`:'—'}</Link></td><td><Team id={String(m.canonical_away_team_id)} name={m.canonical_away_team_name||'—'} color={m.away?.color} logo={m.away?.logo}/></td><td><Status status={m.status}/></td><td className="caption venue" title={m.venue||''}>{m.venue||'—'}</td></tr>})}</tbody></table></div>;
+  return <div className="table-wrap match-table"><table><colgroup><col/><col/><col/><col/><col/><col/><col/></colgroup><thead><tr><th>Data</th><th className="center">Rodada</th><th className="right">Mandante</th><th className="center">Placar</th><th>Visitante</th><th>Status</th><th>Estádio</th></tr></thead><tbody>{matches.map(m=>{const hs=m.home_score,as=m.away_score,mobileDate=formatMobileDate(m);return <tr key={m.canonical_match_id}><td className="caption nowrap"><span className="match-date-full">{formatDate(m)}</span><span className="match-date-mobile"><span>{mobileDate.date}</span>{mobileDate.time&&<small>{mobileDate.time}</small>}</span></td><td className="center">{m.round??'—'}</td><td className="right"><Team reverse id={String(m.canonical_home_team_id)} name={m.canonical_home_team_name||'—'} color={m.home?.color} logo={m.home?.logo}/></td><td className="center"><Link href={`/partidas/${m.canonical_match_id}`} className="score-link numeric">{hs!=null&&as!=null?`${hs} — ${as}`:'—'}</Link></td><td><Team id={String(m.canonical_away_team_id)} name={m.canonical_away_team_name||'—'} color={m.away?.color} logo={m.away?.logo}/></td><td><Status status={m.status}/></td><td className="caption venue" title={m.venue||''}>{m.venue||'—'}</td></tr>})}</tbody></table></div>;
 }
 
 export function Kpis({items}:{items:{label:string,value:string|number,note?:string}[]}){

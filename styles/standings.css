@@ -631,22 +631,13 @@
 .club-statistics-toolbar p {
   margin: 2px 0 0;
 }
-.club-statistics-toolbar label {
+.club-statistics-toolbar > .styled-select {
   display: grid;
   gap: 4px;
   flex: none;
+  min-width: 220px;
   color: var(--muted);
   font-size: 10px;
-}
-.club-statistics-toolbar select {
-  min-width: 220px;
-  height: 34px;
-  padding: 0 30px 0 10px;
-  border: 1px solid var(--theme-border-control);
-  border-radius: 6px;
-  background: var(--theme-surface);
-  color: var(--text);
-  font-size: 11px;
 }
 .club-match-stat-table {
   border: 0;
@@ -948,10 +939,7 @@
     align-items: stretch;
     flex-direction: column;
   }
-  .club-statistics-toolbar label {
-    width: 100%;
-  }
-  .club-statistics-toolbar select {
+  .club-statistics-toolbar > .styled-select {
     width: 100%;
     min-width: 0;
   }

@@ -20,6 +20,9 @@
 .match-detail-facts.is-without-attendance{grid-template-columns:repeat(3,minmax(0,1fr));max-width:900px;margin-inline:auto}
 .match-detail-facts.is-without-attendance>span{text-align:center}
 .match-detail-facts.is-without-attendance>span:first-child{padding-left:14px}
+.match-detail-facts.is-date-venue-only{grid-template-columns:repeat(2,minmax(0,1fr));max-width:640px;margin-inline:auto}
+.match-detail-facts.is-date-venue-only>span{text-align:center}
+.match-detail-facts.is-date-venue-only>span:first-child{padding-left:14px}
 .match-detail-facts small,.match-section-kicker{color:var(--light-hex-84918a);font-size:9px;line-height:13px;font-weight:650;letter-spacing:.08em}
 .match-detail-facts strong{overflow:hidden;color:var(--light-hex-252a27);font-size:11px;line-height:16px;font-weight:550;text-overflow:ellipsis;white-space:nowrap}
 .match-detail-section{min-width:0;padding:20px}
@@ -92,7 +95,7 @@
 .match-betting-notice strong{color:var(--light-hex-344139)}
 .match-odds-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .match-odd-market{min-width:0;padding:10px 11px;border:1px solid var(--light-hex-edf0ee);border-radius:7px;background:var(--light-hex-fcfdfc)}
-.match-odd-market h3{display:flex;justify-content:space-between;gap:8px;margin:0 0 5px;font-size:11px;line-height:16px;font-weight:650}
+.match-odd-market h3{margin:0 0 5px;font-size:11px;line-height:16px;font-weight:650}
 .match-odd-market h3 span{color:var(--light-hex-66736b);font-weight:500}
 .match-odd-market p{display:flex;justify-content:space-between;gap:10px;margin:0;padding-top:4px;color:var(--muted);font-size:11px;line-height:15px}
 .match-odd-market p strong{color:var(--light-hex-202622);font-size:12px;font-variant-numeric:tabular-nums;font-weight:600}

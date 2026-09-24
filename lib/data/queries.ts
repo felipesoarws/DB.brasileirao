@@ -130,7 +130,7 @@ export function seasonRoundLeaders(s:string){
     if(!Number.isFinite(round))continue;
     const rows=byRound.get(round)||[];rows.push(row);byRound.set(round,rows);
   }
-  return [...byRound.entries()].sort(([a],[b])=>b-a).map(([round,rows])=>{
+  return [...byRound.entries()].sort(([a],[b])=>a-b).map(([round,rows])=>{
     const leaders=startedRounds.has(round)?rows.filter(row=>Number(row.position)===1):[],points=Math.max(0,...leaders.map(row=>Number(row.points)||0));
     return {round,leaders:leaders.map(row=>{
       const teamId=String(row.canonical_team_id||row.team_id),club=clubs.get(teamId);

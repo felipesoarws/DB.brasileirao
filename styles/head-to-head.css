@@ -17,6 +17,10 @@
 .head-to-head-stat.is-draw>strong{color:var(--theme-text-secondary)}
 .head-to-head-stat.is-away{border-left:4px solid var(--away-team);background:color-mix(in srgb,var(--away-team) 7%,var(--theme-surface))}
 .head-to-head-stat.is-away>strong{color:var(--away-team)}
+[data-theme="dark"] .head-to-head-stat.is-home{border-left-color:color-mix(in srgb,var(--home-team) 58%,#fff)}
+[data-theme="dark"] .head-to-head-stat.is-home>strong,[data-theme="dark"] .head-to-head-goals>div strong:first-child,[data-theme="dark"] .head-to-head-goals>small b:first-child{color:color-mix(in srgb,var(--home-team) 58%,#fff)}
+[data-theme="dark"] .head-to-head-stat.is-away{border-left-color:color-mix(in srgb,var(--away-team) 58%,#fff)}
+[data-theme="dark"] .head-to-head-stat.is-away>strong,[data-theme="dark"] .head-to-head-goals>div strong:last-child,[data-theme="dark"] .head-to-head-goals>small b:last-child{color:color-mix(in srgb,var(--away-team) 58%,#fff)}
 .head-to-head-goals>div,.head-to-head-goals>small{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .head-to-head-goals>div strong:first-child,.head-to-head-goals>small b:first-child{color:var(--home-team)}
 .head-to-head-goals>div strong:last-child,.head-to-head-goals>small b:last-child{color:var(--away-team)}

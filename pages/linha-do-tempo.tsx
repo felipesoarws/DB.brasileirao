@@ -3,6 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {gold,isFinished,teamsMap} from '../lib/data/gold';
 import {Header,Kpis} from '../components/ui';
 import TeamSelect from '../components/TeamSelect';
+import StyledSelect from '../components/StyledSelect';
 
 type Club={id:string;name:string;color:string|null};
 type PositionPoint={round:number;position:number|null;confirmed:boolean};
@@ -19,19 +20,27 @@ function PositionChart({points,teamCount,roundCount,color}:{points:PositionPoint
   useEffect(()=>{const container=containerRef.current;if(!container)return;const observer=new ResizeObserver(()=>setWidth(Math.max(320,Math.round(container.clientWidth))));observer.observe(container);return()=>observer.disconnect()},[points.length]);
   const confirmedPoints=points.filter((point):point is PositionPoint&{position:number}=>point.confirmed&&point.position!==null);
   if(!confirmedPoints.length)return <div className="position-timeline-chart" ref={containerRef}><div className="empty">A temporada ainda não tem rodadas disputadas para confirmar posições.</div></div>;
-  const height=390,pad={top:24,right:24,bottom:42,left:46},plotWidth=width-pad.left-pad.right,plotHeight=height-pad.top-pad.bottom;
+  const height=width<520?400:390,pad={top:24,right:28,bottom:60,left:46},plotWidth=width-pad.left-pad.right,plotHeight=height-pad.top-pad.bottom;
   const x=(round:number)=>pad.left+(roundCount<=1?0:(round-1)*plotWidth/(roundCount-1));
   const y=(position:number)=>pad.top+(teamCount<=1?plotHeight/2:(position-1)*plotHeight/(teamCount-1));
   const line=confirmedPoints.map(point=>`${x(point.round)},${y(point.position)}`).join(' ');
   const yTicks=[...new Set([1,...Array.from({length:Math.floor(teamCount/5)},(_,i)=>(i+1)*5),teamCount])].filter(position=>position<=teamCount);
-  const xTicks=[...new Set([1,...Array.from({length:Math.floor(roundCount/4)},(_,i)=>(i+1)*4),roundCount])].filter(round=>round<=roundCount);
-  return <div className="position-timeline-chart" ref={containerRef}><svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={`Posições confirmadas em ${confirmedPoints.length} rodadas do campeonato`}>
+  const tickEvery=width<520?6:4;
+  const xTicks=[1];
+  for(let round=1+tickEvery;round<roundCount;round+=tickEvery)xTicks.push(round);
+  if(roundCount>1){
+    const lastTick=xTicks.at(-1)!;
+    if(roundCount-lastTick>=Math.max(4,tickEvery-1))xTicks.push(roundCount);
+    else if(xTicks.length>1)xTicks[xTicks.length-1]=roundCount;
+    else xTicks.push(roundCount);
+  }
+  return <div className="position-timeline-chart" ref={containerRef} style={{'--team-color':color} as any}><svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img" aria-label={`Posições confirmadas em ${confirmedPoints.length} rodadas do campeonato`}>
     {yTicks.map(position=>{const cy=y(position);return <g key={position}><line className="position-timeline-grid" x1={pad.left} y1={cy} x2={width-pad.right} y2={cy}/><text className="position-timeline-axis" x={pad.left-10} y={cy+4} textAnchor="end">{position}º</text></g>})}
     <line className="position-timeline-baseline" x1={pad.left} y1={pad.top} x2={pad.left} y2={pad.top+plotHeight}/>
     <line className="position-timeline-baseline" x1={pad.left} y1={pad.top+plotHeight} x2={width-pad.right} y2={pad.top+plotHeight}/>
-    {xTicks.map(round=><text className="position-timeline-axis" key={round} x={x(round)} y={height-13} textAnchor="middle">R{round}</text>)}
-    {confirmedPoints.length>1&&<polyline className="position-timeline-line" points={line} style={{stroke:color}}/>}
-    {confirmedPoints.map(point=><g key={point.round} tabIndex={0} role="graphics-symbol" aria-label={`Rodada ${point.round}: ${point.position}º lugar`} onMouseEnter={()=>setHovered(point)} onMouseLeave={()=>setHovered(null)} onFocus={()=>setHovered(point)} onBlur={()=>setHovered(null)}><circle className="position-timeline-point" cx={x(point.round)} cy={y(point.position)} r={hovered?.round===point.round?8:6} style={{fill:color}}/><title>{`Rodada ${point.round}: ${point.position}º lugar`}</title></g>)}
+    {xTicks.map(round=><text className="position-timeline-axis" key={round} x={x(round)} y={height-20} textAnchor="middle">R{round}</text>)}
+    {confirmedPoints.length>1&&<polyline className="position-timeline-line" points={line}/>}
+    {confirmedPoints.map(point=><g key={point.round} tabIndex={0} role="graphics-symbol" aria-label={`Rodada ${point.round}: ${point.position}º lugar`} onMouseEnter={()=>setHovered(point)} onMouseLeave={()=>setHovered(null)} onFocus={()=>setHovered(point)} onBlur={()=>setHovered(null)}><circle className="position-timeline-point" cx={x(point.round)} cy={y(point.position)} r={hovered?.round===point.round?8:6}/><title>{`Rodada ${point.round}: ${point.position}º lugar`}</title></g>)}
     {hovered&&hovered.position!==null&&(()=>{const boxWidth=170,boxHeight=30,pointX=x(hovered.round),pointY=y(hovered.position),boxX=Math.max(pad.left,Math.min(width-pad.right-boxWidth,pointX-boxWidth/2)),boxY=pointY>pad.top+boxHeight+12?pointY-boxHeight-11:pointY+11;return <g className="position-timeline-tooltip" role="tooltip" pointerEvents="none"><rect x={boxX} y={boxY} width={boxWidth} height={boxHeight} rx="6"/><text x={boxX+boxWidth/2} y={boxY+19} textAnchor="middle">Rodada {hovered.round} · {hovered.position}º lugar</text></g>})()}
   </svg></div>;
 }
@@ -45,7 +54,7 @@ export default function TeamTimelinePage({clubs,seasons,teamId,season,team,point
     <Header title="Linha do tempo" desc="Acompanhe a posição de um clube rodada a rodada até o fim do campeonato."/>
     <form ref={formRef} className="position-timeline-filters card" method="get" action="/linha-do-tempo">
       <TeamSelect name="time" label="Time" teams={clubs} value={selectedTeamId} onChange={id=>{setSelectedTeamId(id);setSelectedSeason('')}} autoSubmit/>
-      <label><span>Temporada</span><select name="temporada" value={selectedSeason} onChange={event=>setSelectedSeason(event.target.value)}><option value="">Temporada mais recente</option>{seasons.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
+      <StyledSelect name="temporada" label="Temporada" value={selectedSeason} onChange={setSelectedSeason} options={[{value:'',label:'Temporada mais recente'},...seasons.map(value=>({value,label:value}))]}/>
       <button className="btn primary" type="submit">Ver linha do tempo</button>
     </form>
     {!team?<div className="empty">Selecione o time e a temporada para ver a evolução na classificação.</div>:<>

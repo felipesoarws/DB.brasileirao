@@ -5,3 +5,7 @@
 .sidebar .brand b,.drawer .brand b{line-height:14px}
 .sidebar .brand small,.drawer .brand small{margin-top:-1px;line-height:12px}
 .social .ico svg{display:block;width:15px;height:15px;fill:currentColor}
+.team{--team-accent:var(--team,var(--theme-brand-primary))}
+.team:hover .team-name{color:var(--team-accent,var(--theme-brand-primary))}
+[data-theme="dark"] .team{--team-accent:color-mix(in srgb,var(--team,var(--theme-brand-primary)) 58%,#fff)}
+[data-theme="dark"] .club-record-name-link:hover{color:color-mix(in srgb,var(--team,var(--theme-brand-primary)) 58%,#fff)}

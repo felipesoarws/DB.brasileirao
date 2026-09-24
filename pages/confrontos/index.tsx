@@ -16,10 +16,9 @@ export default function HeadToHeadPage({clubs,homeId,awayId,mode,homeName,awayNa
   return <>
     <Header title="Confronto direto" desc="Compare o histórico de partidas entre dois clubes do Brasileirão."/>
     <form className="head-to-head-filters card" method="get" action="/confrontos">
-      <TeamSelect name="mandante" label="Mandante" teams={clubs} value={selectedHome} onChange={id=>{setSelectedHome(id);if(id===selectedAway)setSelectedAway('')}} excludeIds={selectedAway?[selectedAway]:[]}/>
-      <TeamSelect name="visitante" label="Visitante" teams={clubs} value={selectedAway} onChange={setSelectedAway} excludeIds={selectedHome?[selectedHome]:[]}/>
-      <StyledSelect name="recorte" label="Recorte dos jogos" value={mode} options={[{value:'all',label:'Todos os confrontos'},{value:'home',label:`${homeName} como mandante`,disabled:!ready},{value:'away',label:`${awayName} como mandante`,disabled:!ready}]}/>
-      <button className="btn primary" type="submit">Comparar clubes</button>
+      <TeamSelect name="mandante" label="Mandante" teams={clubs} value={selectedHome} onChange={id=>{setSelectedHome(id);if(id===selectedAway)setSelectedAway('')}} autoSubmit excludeIds={selectedAway?[selectedAway]:[]}/>
+      <TeamSelect name="visitante" label="Visitante" teams={clubs} value={selectedAway} onChange={setSelectedAway} autoSubmit excludeIds={selectedHome?[selectedHome]:[]}/>
+      <StyledSelect name="recorte" label="Recorte do mando" value={mode} onChange={()=>window.requestAnimationFrame(()=>document.querySelector<HTMLFormElement>('.head-to-head-filters')?.requestSubmit())} options={[{value:'all',label:'Todos os confrontos'},{value:'home',label:`${homeName} como mandante`,disabled:!ready},{value:'away',label:`${awayName} como mandante`,disabled:!ready}]}/>
     </form>
     {!ready?<div className="empty">Selecione o mandante e o visitante para consultar o histórico entre eles.</div>:<>
       <div className="head-to-head-title"><div><h2>{homeName} <span>x</span> {awayName}</h2><p className="caption">{modeLabel} · partidas finalizadas</p></div><span className="caption">{totals.played} {totals.played===1?'partida':'partidas'}</span></div>

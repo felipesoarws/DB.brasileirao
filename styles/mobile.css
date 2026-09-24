@@ -39,19 +39,20 @@
   .champions-card{padding-right:12px;padding-left:12px}
 }
 
-.club-detail{--club-color:var(--theme-brand-primary);display:grid;gap:20px}
+.club-detail{--club-color:var(--theme-brand-primary);--club-accent:var(--club-color);display:grid;gap:20px}
+[data-theme="dark"] .club-detail{--club-accent:color-mix(in srgb,var(--club-color) 58%,#fff)}
 .club-hero{min-height:118px;display:flex;align-items:center;gap:18px;padding:20px 24px;background:linear-gradient(100deg,color-mix(in srgb,var(--club-color) 8%,var(--theme-surface)),var(--theme-surface) 62%);border-color:color-mix(in srgb,var(--club-color) 18%,var(--border))}
 .club-hero-logo{width:64px;height:64px;flex:none;object-fit:contain}
 .club-hero-copy h1{margin:0;font-size:24px;line-height:31px;font-weight:650;letter-spacing:-.025em}
 .club-hero-copy p{margin:2px 0 0;color:var(--theme-text-secondary);font-size:14px}
-.club-hero-copy p strong{color:var(--club-color);font-weight:600}
+.club-hero-copy p strong{color:var(--club-accent);font-weight:600}
 .club-hero-copy .club-title-years{display:flex;align-items:center;gap:6px;margin-top:5px;color:var(--light-hex-78580b);font-size:12px;line-height:17px}
 .club-title-years strong{color:var(--light-hex-78580b);font-weight:650}
 .club-metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
 .club-metric{min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:12px 8px}
 .club-metric strong{font-size:24px;line-height:30px;font-weight:700;font-variant-numeric:tabular-nums}
 .club-metric span{color:var(--muted);font-size:12px}
-.club-metric-neutral{color:var(--club-color)}
+.club-metric-neutral{color:var(--club-accent)}
 .club-metric-win,.club-cell-win{color:var(--light-hex-16a34a)!important}
 .club-metric-draw,.club-cell-draw{color:var(--light-hex-ca8a04)!important}
 .club-metric-loss,.club-cell-loss{color:var(--light-hex-e11d48)!important}
@@ -63,10 +64,10 @@
 .club-chart-grid{stroke:var(--theme-border-control);stroke-width:1;stroke-dasharray:3 4}
 .club-chart-baseline{stroke:var(--border);stroke-width:1}
 .club-chart-axis,.club-chart-season{fill:var(--theme-text-muted);font-family:var(--font-geist),Arial,sans-serif;font-size:11px}
-.club-chart-line{fill:none;stroke:var(--club-color);stroke-width:2}
-.club-chart-point{fill:var(--club-color)}
+.club-chart-line{fill:none;stroke:var(--club-accent);stroke-width:2}
+.club-chart-point{fill:var(--club-accent)}
 .club-point-value{fill:var(--theme-text-secondary);font-family:var(--font-geist),Arial,sans-serif;font-size:10px;font-weight:500}
-.club-goals-bar{fill:var(--club-color)}
+.club-goals-bar{fill:var(--club-accent)}
 .club-goals-value{fill:var(--theme-text-muted);font-family:var(--font-geist),Arial,sans-serif;font-size:11px}
 .club-history-list{width:100%;font-variant-numeric:tabular-nums}
 .club-history-list-head,.club-history-list-row{display:grid;grid-template-columns:minmax(100px,.65fr) minmax(0,2fr) minmax(48px,.4fr);align-items:center;gap:8px}
@@ -79,7 +80,7 @@
 .club-history-list-row.is-champion{background:var(--light-hex-fffbeb);box-shadow:inset 3px 0 var(--light-hex-d4a017)}
 .club-history-list-row.is-current.is-champion{background:linear-gradient(90deg,var(--light-hex-eff6ff),var(--light-hex-fffbeb));box-shadow:inset 3px 0 var(--light-hex-a87908)}
 .club-history-season{display:flex;align-items:center;gap:10px}
-.club-history-season a{color:var(--club-color);font-size:15px;font-weight:650;text-decoration:none}
+.club-history-season a{color:var(--club-accent);font-size:15px;font-weight:650;text-decoration:none}
 .club-history-season a:hover{text-decoration:underline}
 .club-history-position{min-width:30px;padding:2px 6px;border-radius:999px;background:var(--light-hex-f4f4f5);color:var(--theme-text-secondary);text-align:center;font-size:11px;font-weight:600}
 .club-history-flag{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
@@ -87,7 +88,7 @@
 .club-history-flag-champion{font-size:15px;line-height:18px}
 .club-history-campaign{display:flex;align-items:center;gap:10px;min-width:0}
 .club-history-points{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
-.club-history-points strong{color:var(--club-color);font-size:17px;line-height:22px}
+.club-history-points strong{color:var(--club-accent);font-size:17px;line-height:22px}
 .club-history-points>span,.club-history-points small{color:var(--muted);font-size:11px}
 .club-history-points small{margin-left:4px}
 .club-history-results{display:flex;align-items:center;gap:6px}
@@ -127,7 +128,7 @@
 .club-venue-card{min-width:0;padding:10px 12px;border:1px solid var(--border);border-radius:7px;background:var(--light-hex-fcfcfc)}
 .club-venue-card h3{margin:0 0 5px;font-size:12px;line-height:17px;font-weight:600}
 .club-venue-rate{display:flex;align-items:baseline;gap:6px}
-.club-venue-rate strong{color:var(--club-color);font-size:20px;line-height:25px;font-variant-numeric:tabular-nums}
+.club-venue-rate strong{color:var(--club-accent);font-size:20px;line-height:25px;font-variant-numeric:tabular-nums}
 .club-venue-rate span,.club-venue-card p{color:var(--muted);font-size:10px}
 .club-venue-record{display:flex;gap:9px;margin-top:5px;font-size:10px;font-weight:600;font-variant-numeric:tabular-nums}
 .club-venue-card p{margin:5px 0 0}
@@ -265,3 +266,96 @@
 .round-leader-list>.team{gap:7px;font-size:12px}
 .round-leader-list .club-mark{width:24px;height:24px;background:transparent}
 @media(max-width:680px){.round-leaders-panel>.statistics-section-heading{align-items:flex-start;flex-wrap:wrap}.round-leaders-all{margin-left:0}}
+
+::selection{background:var(--theme-brand-primary);color:#fff}
+.team-short-name{display:none}
+.match-date-mobile{display:none}
+
+@media(max-width:900px){
+  .drawer{width:min(340px,calc(100vw - 36px));max-height:100dvh;overflow-y:auto;overscroll-behavior:contain;padding:22px 16px 18px;background:var(--theme-surface-sidebar);border-right:1px solid var(--border);animation:mobile-drawer-in 220ms cubic-bezier(.2,.75,.25,1) both;transform-origin:left center}
+  .drawer.is-closing{animation:mobile-drawer-out 220ms cubic-bezier(.4,0,1,1) both;pointer-events:none}
+  .drawer>.brand{min-height:54px;gap:11px;padding:0 48px 20px 6px}
+  .drawer .brand .mark{width:36px;height:36px;border-radius:9px}
+  .drawer .brand b{font-size:15px;line-height:19px}
+  .drawer .brand small{font-size:12px;line-height:17px}
+  .drawer-close{position:absolute;top:20px;right:16px;width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--border);border-radius:9px;background:var(--theme-surface);color:var(--text);font-size:24px;line-height:1;cursor:pointer}
+  .drawer-close:focus-visible{outline:0;border-color:var(--theme-border-accent);box-shadow:0 0 0 3px var(--theme-focus-ring)}
+  .drawer>.nav-label{display:block;padding:9px 10px 8px;color:var(--theme-text-subtle);font-size:10px;font-weight:650;letter-spacing:.08em;text-transform:uppercase}
+  .drawer>.nav{gap:5px}
+  .drawer>.nav a{min-height:46px;gap:12px;padding:0 12px;border:1px solid transparent;border-radius:9px;font-size:14px;font-weight:550}
+  .drawer>.nav a.active{border-color:var(--theme-border-accent);background:var(--theme-accent-soft);color:var(--theme-brand-primary)}
+  .drawer>.nav .ico{width:22px;height:22px;display:grid;place-items:center;border-radius:7px;background:var(--theme-surface-subtle);color:var(--theme-text-secondary);font-size:14px}
+  .drawer>.nav a.active .ico{background:var(--theme-surface);color:var(--theme-brand-primary)}
+  .drawer>.spacer{min-height:22px}
+  .drawer>.institutional{gap:5px 8px;padding:10px 5px;border-top:1px solid var(--border)}
+  .drawer>.institutional a{min-height:32px;display:flex;align-items:center;padding:0 5px;font-size:11px}
+  .drawer .side-foot{margin:8px 4px 0;padding-top:12px}
+  .drawer .theme-toggle{min-height:42px}
+  .drawer .social{min-height:38px;font-size:12px}
+  .drawer .status{padding:4px 2px 0;font-size:10px;line-height:15px}
+  .overlay{animation:mobile-overlay-in 180ms ease both}
+  .overlay.is-closing{animation:mobile-overlay-out 220ms ease both;pointer-events:none}
+  .mobile .brand{position:absolute;right:14px;left:auto;padding:0;transform:none}
+  .mobile>.btn{position:absolute;left:12px}
+}
+@keyframes mobile-drawer-in{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes mobile-drawer-out{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-32px)}}
+@keyframes mobile-overlay-in{from{opacity:0}to{opacity:1}}
+@keyframes mobile-overlay-out{from{opacity:1}to{opacity:0}}
+@media(prefers-reduced-motion:reduce){.drawer,.drawer.is-closing,.overlay,.overlay.is-closing{animation:none}}
+
+@media(max-width:680px){
+  .page .table-wrap th:first-child,.page .table-wrap td:first-child{padding-left:12px!important}
+  .page .table-wrap th:last-child,.page .table-wrap td:last-child{padding-right:12px!important}
+  .tabs.season-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;overflow:visible;margin:14px 0 20px;border:0}
+  .tabs.season-tabs a{display:flex;min-width:0;min-height:38px;align-items:center;justify-content:center;padding:7px 8px;border:1px solid var(--border);border-radius:7px;background:var(--theme-surface);font-size:11px;line-height:15px;text-align:center;white-space:normal}
+  .tabs.season-tabs a.active{border-color:var(--theme-border-accent);background:var(--theme-accent-soft);color:var(--theme-brand-primary);font-weight:600}
+  .season-leader-table{width:100%;overflow:hidden}
+  .season-leader-table table{width:100%;min-width:0;table-layout:fixed;font-size:10px}
+  .season-leader-table col:nth-child(1){width:10%}.season-leader-table col:nth-child(2){width:37%}.season-leader-table col:nth-child(3){width:35%}.season-leader-table col:nth-child(4){width:18%}
+  .season-leader-table th,.season-leader-table td{min-width:0;padding:7px 4px;white-space:nowrap}
+  .season-leader-table th:first-child,.season-leader-table td:first-child{padding-left:10px}
+  .season-leader-table th:last-child,.season-leader-table td:last-child{padding-right:12px}
+  .season-leader-table td:nth-child(2){overflow:hidden;text-overflow:ellipsis}
+  .season-leader-table td:nth-child(3)>.team{gap:4px}
+  .season-leader-table td:nth-child(3) .club-mark{width:18px;height:18px}
+  .season-leader-table td:nth-child(3) .team-name{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .round-leaders-table{width:100%;overflow:hidden}
+  .round-leaders-table table{width:100%;min-width:0;table-layout:fixed;font-size:10px}
+  .round-leaders-table th:first-child,.round-leaders-table td:first-child{width:23%;padding-left:9px;white-space:normal}
+  .round-leaders-table th:nth-child(2),.round-leaders-table td:nth-child(2){width:43%}
+  .round-leaders-table th:nth-child(3),.round-leaders-table td:nth-child(3),.round-leaders-table th:nth-child(5),.round-leaders-table td:nth-child(5){width:17%;text-align:center}
+  .round-leaders-table th:nth-child(4),.round-leaders-table td:nth-child(4){display:none}
+  .round-leaders-table th,.round-leaders-table td{padding:7px 3px}
+  .round-leader-list{gap:5px}
+  .round-leader-list>.team{width:100%;min-width:0;gap:4px;font-size:10px}
+  .round-leader-list .club-mark{width:19px;height:19px}
+  .round-leader-list .team-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .statistics-panel.card{min-width:0;overflow:hidden;padding:14px 12px}
+  .statistics-panel>.statistics-section-heading{gap:8px;margin-bottom:12px}
+  .statistics-panel .statistics-section-heading h2{font-size:15px;line-height:20px}
+  .club-performance-table{width:100%;overflow:hidden}
+  .club-performance-table table{width:100%;min-width:0;table-layout:fixed;font-size:9px}
+  .club-performance-table col:nth-child(1){width:8%!important}.club-performance-table col:nth-child(2){width:38%!important}.club-performance-table col:nth-child(3){width:24%!important}.club-performance-table col:nth-child(4){width:22%!important}.club-performance-table col:nth-child(5),.club-performance-table col:nth-child(6),.club-performance-table col:nth-child(7),.club-performance-table col:nth-child(8){display:none}
+  .club-performance-table th:nth-child(5),.club-performance-table td:nth-child(5),.club-performance-table th:nth-child(6),.club-performance-table td:nth-child(6),.club-performance-table th:nth-child(7),.club-performance-table td:nth-child(7),.club-performance-table th:nth-child(8),.club-performance-table td:nth-child(8){display:none}
+  .club-performance-table th,.club-performance-table td{height:38px;padding:6px 3px;white-space:nowrap;font-size:10px!important;line-height:14px;vertical-align:middle}.club-performance-table .team{height:20px;gap:4px}.club-performance-table .team-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;line-height:14px}.club-performance-table .club-mark{width:18px;height:18px}
+  .club-match-stat-table{width:100%;overflow:hidden}
+  .club-match-stat-table table{width:100%;min-width:0;table-layout:fixed;font-size:10px}
+  .club-match-stat-table col:nth-child(1),.club-match-stat-table col:nth-child(4),.club-match-stat-table col:nth-child(5),.club-match-stat-table col:nth-child(6){display:none}.club-match-stat-table col:nth-child(2){width:55%!important}.club-match-stat-table col:nth-child(3){width:45%!important}
+  .club-match-stat-table th:nth-child(1),.club-match-stat-table td:nth-child(1),.club-match-stat-table th:nth-child(4),.club-match-stat-table td:nth-child(4),.club-match-stat-table th:nth-child(5),.club-match-stat-table td:nth-child(5),.club-match-stat-table th:nth-child(6),.club-match-stat-table td:nth-child(6){display:none}
+  .club-performance-table th:nth-child(4),.club-performance-table td:nth-child(4){padding-right:12px!important}
+  .club-match-stat-table th,.club-match-stat-table td{padding:7px 6px;white-space:nowrap}.club-match-stat-table th:nth-child(3),.club-match-stat-table td:nth-child(3){padding-right:12px!important}.club-match-stat-table .team{gap:4px}.club-match-stat-table .team-name{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:10px}.club-match-stat-table .club-mark{width:18px;height:18px}.club-stat-average{gap:5px}.club-stat-average>strong{min-width:42px;font-size:10px}
+  .mobile .brand .mark{width:30px;height:30px}
+  .match-table{overflow:hidden}
+  .match-table table{display:block;min-width:0;width:100%;font-size:10px;table-layout:fixed}
+  .match-table thead,.match-table tbody{display:block;width:100%}
+  .match-table tr{display:grid;width:100%;grid-template-columns:minmax(74px,.9fr) minmax(0,1.5fr) minmax(48px,.7fr) minmax(0,1.5fr);align-items:center}
+  .match-table th:nth-child(2),.match-table td:nth-child(2),.match-table th:nth-child(6),.match-table td:nth-child(6),.match-table th:nth-child(7),.match-table td:nth-child(7){display:none}
+  .match-table th,.match-table td{min-width:0;padding:8px 5px;white-space:normal;overflow:hidden}.match-table th:first-child,.match-table td:first-child{padding-left:10px}.match-table th:nth-child(3){font-size:10px;text-align:right}.match-table th:nth-child(4){font-size:10px;text-align:center}.match-table th:nth-child(5){font-size:10px;padding-left:8px}.match-table .match-date-full{display:none}.match-table .match-date-mobile{display:grid;gap:1px;font-size:10px;line-height:13px;white-space:nowrap}.match-table .match-date-mobile small{font-size:10px}.match-table .team{width:100%;min-width:0;gap:4px}.match-table .team-name{display:inline;min-width:0;overflow:visible;text-overflow:clip;font-size:10px;line-height:12px;white-space:normal;text-align:inherit}.match-table .team-short-name{display:none}.match-table .club-mark{width:20px;height:20px}.match-table .score-link{font-size:11px}.match-table td:nth-child(3) .team{justify-content:flex-end}
+  .standings-table table{min-width:0;width:100%;font-size:10px;table-layout:fixed}
+  .standings-table col:nth-child(1){width:14%!important}.standings-table col:nth-child(2){width:31%!important}.standings-table col:nth-child(3),.standings-table col:nth-child(n+9){display:none}.standings-table col:nth-child(4){width:13%!important}.standings-table col:nth-child(5),.standings-table col:nth-child(6),.standings-table col:nth-child(7),.standings-table col:nth-child(8){width:10.5%!important}
+  .standings-table th:nth-child(3),.standings-table td:nth-child(3),.standings-table th:nth-child(n+9),.standings-table td:nth-child(n+9){display:none}
+  .standings-table th,.standings-table td{padding:7px 4px;white-space:nowrap}.standings-table th:first-child,.standings-table td:first-child{padding-left:9px;font-size:12px;font-weight:650}.standings-table th:nth-child(5),.standings-table td:nth-child(5),.standings-table th:nth-child(6),.standings-table td:nth-child(6),.standings-table th:nth-child(7),.standings-table td:nth-child(7),.standings-table th:nth-child(8),.standings-table td:nth-child(8){padding-right:7px;padding-left:7px;text-align:center}.standings-table .team{width:100%;min-width:0;gap:5px;justify-content:flex-start}.standings-table .team-name{display:inline;min-width:0;overflow:visible;text-overflow:clip;white-space:normal;font-size:11px;line-height:14px}.standings-table .team-short-name,.standings-zone-label{display:none}.standings-table .club-mark{width:19px;height:19px}.standings-table th:nth-child(n+4),.standings-table td:nth-child(n+4){font-size:10px}.standings-table th:nth-child(4),.standings-table td:nth-child(4){text-align:right;padding-right:9px}
+  .club-chart-scroll{flex-basis:340px;height:340px;min-height:340px}.club-chart{min-height:340px}.club-point-value{display:none}.club-chart-axis,.club-chart-season{font-size:10px}
+  .club-history-list-head,.club-history-list-row{grid-template-columns:minmax(0,1fr) auto auto;gap:6px;padding-right:5px;padding-left:5px}.club-history-list-head span:nth-child(2){display:none}.club-history-list-row{min-height:42px}.club-history-season{gap:4px}.club-history-season a{font-size:13px}.club-history-position{min-width:24px;padding:2px 4px;font-size:9px}.club-history-flag-champion{font-size:12px;line-height:14px}.club-history-campaign{justify-content:flex-end}.club-history-points{gap:2px}.club-history-points strong{font-size:15px;line-height:19px}.club-history-points>span,.club-history-results,.club-history-points small{display:none}.club-history-difference{gap:3px;font-size:10px}.club-history-difference strong{font-size:12px}
+}

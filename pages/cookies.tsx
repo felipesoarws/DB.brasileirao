@@ -8,7 +8,7 @@ export default function Cookies(){
   return <Institutional title="Cookies e preferências" desc="Gerencie a preferência salva por este navegador.">
     <section className="card" aria-live="polite">
       <p>Status atual: <b>{value==='accepted'?'Aceito':value==='rejected'?'Recusado':'Ainda não escolhido'}</b></p>
-      <p className="desc">O BR.database grava somente sua escolha sobre o aviso de preferências, no armazenamento local deste navegador. A aplicação não usa essa escolha para personalização ou publicidade.</p>
+      <p className="desc">O Database grava somente sua escolha sobre o aviso de preferências, no armazenamento local deste navegador. A aplicação não usa essa escolha para personalização ou publicidade.</p>
       <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
         <button className="btn primary" onClick={()=>save('accepted')}>Aceitar</button>
         <button className="btn" onClick={()=>save('rejected')}>Recusar</button>

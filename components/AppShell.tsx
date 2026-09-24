@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {useRouter} from 'next/router';
-import {ReactNode,useEffect,useState} from 'react';
+import {ReactNode,useEffect,useRef,useState} from 'react';
 
 type Theme='light'|'dark';
 const nav=[['⌘','Dashboard','/'],['▣','Temporadas','/temporadas'],['♙','Clubes','/clubes'],['○','Partidas','/partidas'],['⇄','Confrontos','/confrontos'],['◷','Linha do tempo','/linha-do-tempo'],['▥','Recordes','/recordes']];
@@ -10,7 +10,8 @@ function BrandMark(){return <span className="mark"><img src="/favicon.png?v=2026
 function Menu({close,updated,theme,onToggle}:{close?:()=>void;updated:string;theme:Theme;onToggle:()=>void}){
   const router=useRouter();
   return <>
-    <Link className="brand" href="/" onClick={close}><BrandMark/><span><b>BR.database</b><small>Brasileirão Série A</small></span></Link>
+    <Link className="brand" href="/" onClick={close}><BrandMark/><span><b>Database</b><small>Brasileirão Série A</small></span></Link>
+    {close&&<button type="button" className="drawer-close" aria-label="Fechar menu" onClick={close}>×</button>}
     <span className="nav-label">Navegação</span>
     <nav className="nav">
       {nav.map(([icon,name,href])=><Link key={href} href={href} onClick={close} className={router.pathname===href||(href!=='/'&&router.pathname.startsWith(href))?'active':''}><span className="ico">{icon}</span>{name}</Link>)}
@@ -47,19 +48,27 @@ function BackButton(){
 }
 
 export default function AppShell({children}:{children:ReactNode}){
-  const [open,setOpen]=useState(false),[updated,setUpdated]=useState(''),[theme,setTheme]=useState<Theme>('light');
+  const [open,setOpen]=useState(false),[closing,setClosing]=useState(false),[updated,setUpdated]=useState(''),[theme,setTheme]=useState<Theme>('light');
   const router=useRouter();
+  const openRef=useRef(open);
+  openRef.current=open;
+  function closeMenu(){if(openRef.current)setClosing(true)}
   useEffect(()=>{
     const saved=localStorage.getItem('brdb-theme');
     const initial:Theme=saved==='dark'?'dark':'light';
     setTheme(initial);
     document.documentElement.dataset.theme=initial;
     document.documentElement.style.colorScheme=initial;
-    const handleEscape=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false)};
+    const handleEscape=(event:KeyboardEvent)=>{if(event.key==='Escape')closeMenu()};
     addEventListener('keydown',handleEscape);
     fetch('/api/data-status').then(response=>response.ok?response.json():null).then(data=>{if(data?.lastUpdated){const date=new Date(data.lastUpdated);if(!Number.isNaN(date.getTime()))setUpdated(date.toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}))}}).catch(()=>{});
     return()=>removeEventListener('keydown',handleEscape);
   },[]);
+  useEffect(()=>{
+    if(!closing)return;
+    const timer=window.setTimeout(()=>{setOpen(false);setClosing(false)},220);
+    return()=>window.clearTimeout(timer);
+  },[closing]);
   const toggleTheme=()=>setTheme(current=>{
     const next:Theme=current==='dark'?'light':'dark';
     localStorage.setItem('brdb-theme',next);
@@ -70,8 +79,8 @@ export default function AppShell({children}:{children:ReactNode}){
   const menuProps={updated,theme,onToggle:toggleTheme};
   return <div className={`shell app-${router.pathname==='/'?'home':'page'}`}>
     <aside className="sidebar"><Menu {...menuProps}/></aside>
-    <header className="mobile"><Link href="/" className="brand"><BrandMark/><b>BR.database</b></Link><button className="btn" aria-label="Abrir menu" aria-expanded={open} onClick={()=>setOpen(true)}>☰</button></header>
-    {open&&<><div className="overlay" onClick={()=>setOpen(false)}/><aside className="drawer"><Menu {...menuProps} close={()=>setOpen(false)}/></aside></>}
+    <header className="mobile"><Link href="/" className="brand" aria-label="Página inicial"><BrandMark/></Link><button className="btn" aria-label="Abrir menu" aria-expanded={open&&!closing} onClick={()=>{setClosing(false);setOpen(true)}}>☰</button></header>
+    {open&&<><div className={`overlay${closing?' is-closing':''}`} onClick={closeMenu}/><aside className={`drawer${closing?' is-closing':''}`}><Menu {...menuProps} close={closeMenu}/></aside></>}
     <main className="main"><div className="page" key={router.asPath}>{router.pathname!=='/'&&<BackButton/>}{children}</div></main>
     <Cookie/>
   </div>;

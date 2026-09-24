@@ -68,9 +68,10 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
   };
   const closePopover=()=>setHovered(null);
   const color=team.color?`#${String(team.color).replace(/^#/,'')}`:'var(--theme-brand-primary)';
-  const chartWidth=Math.max(300,chartViewportWidth),chartHeight=300,pad={top:18,right:14,bottom:32,left:38};
+  const chartWidth=Math.max(300,chartViewportWidth),isNarrowChart=chartWidth<520,chartHeight=isNarrowChart?340:300,pad={top:18,right:isNarrowChart?18:14,bottom:isNarrowChart?58:32,left:38};
   const plotWidth=chartWidth-pad.left-pad.right,plotHeight=chartHeight-pad.top-pad.bottom;
   const seasonAxis=goalsBySeason.map((row,index)=>({season:row.season,index,x:pad.left+(goalsBySeason.length<2?plotWidth/2:index*plotWidth/(goalsBySeason.length-1))}));
+  const visibleSeasonAxis=seasonAxis.filter(item=>isNarrowChart?item.index%Math.max(1,Math.ceil(seasonAxis.length/5))===0:item.index%2===0);
   const seasonX=new Map(seasonAxis.map(item=>[item.season,item.x]));
   const chronological=history.slice().reverse();
   const points:ChartPoint[]=chronological.flatMap(row=>{const x=seasonX.get(String(row.season));return x==null?[]:[{x,y:pad.top+plotHeight-(row.percentage/100)*plotHeight,...row}]});
@@ -78,7 +79,7 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
   const maxGoals=Math.max(...goalsBySeason.map(row=>row.average),1);
 
   return <>
-    <Head><title>{team.name} — Brasileirão Database</title><meta name="description" content={`Estatísticas e histórico de temporadas de ${team.name} no Brasileirão Série A.`}/><link key="favicon" rel="icon" type="image/png" href={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`}/></Head>
+    <Head><title>{team.name} — Database</title><meta name="description" content={`Estatísticas e histórico de temporadas de ${team.name} no Brasileirão Série A.`}/><link key="favicon" rel="icon" type="image/png" href={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`}/></Head>
     <div className="club-detail" style={{'--club-color':color} as React.CSSProperties}>
       <header className="club-hero card">
         <img className="club-hero-logo" src={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`} alt={`Escudo do ${team.name}`} onError={event=>{event.currentTarget.style.visibility='hidden'}}/>
@@ -101,7 +102,7 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
           <h2 id="club-chart-title">Aproveitamento por temporada (%)</h2>
           {points.length?<div className="club-chart-scroll" ref={chartContainerRef}><svg className="club-chart" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="none" role="group" aria-label="Gráfico de aproveitamento percentual por temporada">
             {[0,25,50,75,100].map(value=>{const y=pad.top+plotHeight-(value/100)*plotHeight;return <g key={value}><line className={value===0?'club-chart-baseline':'club-chart-grid'} x1={pad.left} y1={y} x2={chartWidth-pad.right} y2={y}/><text className="club-chart-axis" x={pad.left-8} y={y+4} textAnchor="end">{value}</text></g>})}
-            {seasonAxis.filter(item=>item.index%2===0).map(item=><text className="club-chart-season" key={item.season} x={item.x} y={chartHeight-8} textAnchor="middle">{item.season}</text>)}
+            {visibleSeasonAxis.map(item=><text className="club-chart-season" key={item.season} x={item.x} y={chartHeight-12} textAnchor="middle">{item.season}</text>)}
             {points.length>1&&<polyline className="club-chart-line" points={line}/>}
             {points.map(point=><g key={point.season}><circle className="club-chart-point" cx={point.x} cy={point.y} r="4" tabIndex={0} aria-label={`${point.season}: ${point.percentage}% de aproveitamento`} onMouseEnter={event=>openPopover(event,'points',point)} onMouseLeave={closePopover} onFocus={event=>openPopover(event,'points',point)} onBlur={closePopover}><title>{point.season}: {point.percentage}%</title></circle><text className="club-point-value" x={point.x} y={point.y-pad.top<18?point.y+16:point.y-9} textAnchor="middle">{Math.round(point.percentage)}%</text></g>)}
           </svg></div>:<p className="club-empty">Não há temporadas disponíveis para este clube.</p>}
@@ -111,7 +112,7 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
           <h2 id="club-goals-title">Média de gols por temporada</h2>
           {goalsBySeason.length?<div className="club-chart-scroll"><svg className="club-chart" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="none" role="group" aria-label="Média de gols por temporada">
             <line className="club-chart-baseline" x1={pad.left} y1={pad.top+plotHeight} x2={chartWidth-pad.right} y2={pad.top+plotHeight}/>
-            {seasonAxis.filter(item=>item.index%2===0).map(item=><text className="club-chart-season" key={item.season} x={item.x} y={chartHeight-8} textAnchor="middle">{item.season}</text>)}
+            {visibleSeasonAxis.map(item=><text className="club-chart-season" key={item.season} x={item.x} y={chartHeight-12} textAnchor="middle">{item.season}</text>)}
             {goalsBySeason.map(row=>{const x=seasonX.get(row.season)??pad.left,barWidth=Math.min(22,Math.max(8,plotWidth/goalsBySeason.length*.62)),height=(row.average/maxGoals)*plotHeight*.76,y=pad.top+plotHeight-height;return <g key={row.season} tabIndex={0} role="graphics-symbol" aria-label={`${row.season}: ${row.average.toFixed(1)} gols por jogo`} onMouseEnter={event=>openPopover(event,'goals',row)} onMouseLeave={closePopover} onFocus={event=>openPopover(event,'goals',row)} onBlur={closePopover}><rect className="club-goals-bar" x={x-barWidth/2} y={y} width={barWidth} height={height} rx="4" fill={color}/><text className="club-goals-value" x={x} y={y-7} textAnchor="middle">{row.average.toFixed(1)}</text></g>})}
           </svg></div>:<p className="club-empty">Não há médias disponíveis para estas temporadas.</p>}
         </section>

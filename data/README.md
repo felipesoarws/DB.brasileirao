@@ -17,7 +17,8 @@ desenvolvimento ou produção, `scripts/convert_gold.py` converte as tabelas par
 JSON gzipado em `data/gold-json/`. Esse diretório é derivado, ignorado pelo Git
 e incluído no rastreamento de arquivos do Next.js para que as páginas do servidor
 consigam ler os dados no deploy. A leitura usa `pyarrow`, fixado em
-`requirements-build.txt`; no desenvolvimento, instale com
+`requirements-build.txt` (incluindo `tzdata` para disponibilizar fusos horários
+no Windows); no desenvolvimento, instale com
 `python -m pip install -r requirements-build.txt`.
 
 O workflow do GitHub Actions baixa `gdrive:brasileiraodb/gold` antes do build,

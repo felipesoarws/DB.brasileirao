@@ -86,7 +86,7 @@ function OddsPanel({odds,oddsCapturedAt,preKickoffOdds}:{odds:MatchOdd[];oddsCap
   const marketName=(market:string)=>market==='moneyline'||market==='1x2'?'Resultado':market.startsWith('total_')?`Total de gols ${market.slice(6)}`:market==='btts'?'Ambos marcam':market.replaceAll('_',' ');
   const selectionName=(selection:string)=>({home:'Mandante',away:'Visitante',draw:'Empate',over:'Acima',under:'Abaixo',yes:'Sim',no:'Não'}[selection]||selection);
   const collectionDate=oddsCapturedAt?new Date(oddsCapturedAt).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',dateStyle:'short',timeStyle:'short'}):'data indisponível';
-  return <section className="match-detail-section match-odds-section card"><div className="match-section-heading"><div><span className="match-section-kicker">MERCADO</span><h2>Cotações</h2></div><span className="match-data-count">{odds.length} seleções</span></div><p className="match-data-note">Não há coleta anterior ao início desta partida ({preKickoffOdds} registros pré-jogo). Valores abaixo são snapshots posteriores; última coleta: {collectionDate}.</p><p className="match-betting-notice"><strong>Aviso:</strong> apostar não é investimento. Apostas envolvem riscos e podem causar perdas financeiras.</p><div className="match-odds-grid">{[...grouped.entries()].map(([key,items])=>{const [provider,market]=key.split('|');return <article className="match-odd-market" key={key}><h3>{provider} <span>{marketName(market)}</span></h3><div>{items.map(item=><p key={`${item.selection}-${item.collectedAt}`}><span>{selectionName(item.selection)}</span><strong>{item.price.toFixed(2)}</strong></p>)}</div></article>})}</div></section>;
+  return <section className="match-detail-section match-odds-section card"><div className="match-section-heading"><div><span className="match-section-kicker">MERCADO</span><h2>Cotações</h2></div></div><p className="match-data-note">Não há coleta anterior ao início desta partida ({preKickoffOdds} registros pré-jogo). Valores abaixo são snapshots posteriores; última coleta: {collectionDate}.</p><p className="match-betting-notice"><strong>Aviso:</strong> apostar não é investimento. Apostas envolvem riscos e podem causar perdas financeiras.</p><div className="match-odds-grid">{[...grouped.entries()].map(([key,items])=>{const [,market]=key.split('|');return <article className="match-odd-market" key={key}><h3>{marketName(market)}</h3><div>{items.map(item=><p key={`${item.selection}-${item.collectedAt}`}><span>{selectionName(item.selection)}</span><strong>{item.price.toFixed(2)}</strong></p>)}</div></article>})}</div></section>;
 }
 
 export default function MatchDetailPage({match,events,lineups,statPeriods,odds,oddsCapturedAt,preKickoffOdds}:MatchPageProps){
@@ -96,12 +96,13 @@ export default function MatchDetailPage({match,events,lineups,statPeriods,odds,o
   const dateValue=match.kickoff_utc||match.kickoff_date;
   const matchDate=dateValue?new Date(dateValue).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'long',year:'numeric'}):'Data a definir';
   const matchTime=dateValue&&match.kickoff_precision!=='date'?new Date(dateValue).toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}):null;
+  const onlyDateAndVenue=Boolean(match.venue)&&!match.referee&&match.attendance==null;
   return <div className="match-detail-page">
     <Header title={done?'Detalhe da partida':'Prévia da partida'} browserTitle={browserTitle} desc={`${competitionName} ${match.season} · Rodada ${match.round??'—'}`} meta={`Partida ${match.canonical_match_id}`}/>
     <section className="match-detail-hero card" aria-label="Placar e informações da partida">
       <div className="match-detail-topline"><span>{competitionName} <i/> Temporada {match.season} <i/> Rodada {match.round??'—'}</span><Status status={match.status}/></div>
       <div className="match-detail-scoreline"><Team id={String(match.canonical_home_team_id)} name={homeName} color={match.home?.color}/><div className="match-score-center"><strong className="numeric">{done&&match.home_score!=null?`${match.home_score} — ${match.away_score}`:'—'}</strong>{done&&match.home_score_ht!=null&&match.away_score_ht!=null&&<span>Intervalo {match.home_score_ht} — {match.away_score_ht}</span>}</div><Team reverse id={String(match.canonical_away_team_id)} name={awayName} color={match.away?.color}/></div>
-      <div className={`match-detail-facts${match.attendance==null?' is-without-attendance':''}`}><span><small>DATA</small><strong>{matchDate}{matchTime?` · ${matchTime}`:''}</strong></span>{match.venue&&<span><small>ESTÁDIO</small><strong>{match.venue}</strong></span>}{match.referee&&<span><small>ÁRBITRO</small><strong>{match.referee}</strong></span>}{match.attendance!=null&&<span><small>PÚBLICO</small><strong>{Number(match.attendance).toLocaleString('pt-BR')}</strong></span>}</div>
+      <div className={`match-detail-facts${match.attendance==null?' is-without-attendance':''}${onlyDateAndVenue?' is-date-venue-only':''}`}><span><small>DATA</small><strong>{matchDate}{matchTime?` · ${matchTime}`:''}</strong></span>{match.venue&&<span><small>ESTÁDIO</small><strong>{match.venue}</strong></span>}{match.referee&&<span><small>ÁRBITRO</small><strong>{match.referee}</strong></span>}{match.attendance!=null&&<span><small>PÚBLICO</small><strong>{Number(match.attendance).toLocaleString('pt-BR')}</strong></span>}</div>
     </section>
 
     <div className="match-analysis-grid">
@@ -130,21 +131,21 @@ export const getServerSideProps:GetServerSideProps<MatchPageProps>=async({params
   const seenCards=new Set<string>();
   const cards=rawCards.filter((row:Row)=>{const key=`${row.team_id}:${row.player_id}:${row.card}`;if(row.card==='red'&&seenCards.has(key))return false;if(row.card==='red')seenCards.add(key);return true;}).map((row:Row)=>({teamId:teamId(row.team_id),teamName:teamName(row.team_id),minute:row.minute==null?null:Number(row.minute),addedTime:Number(row.added_time)||0,kind:'card' as const,playerName:playerName(row.player_id),assistName:null,card:String(row.card||''),ownGoal:false,penalty:false}));
   const events:MatchEvent[]=[...goals,...cards].sort((a,b)=>(a.minute??0)*100+a.addedTime-((b.minute??0)*100+b.addedTime));
-  const lineupRows=gold('lineups').filter(row=>String(row.canonical_match_id)===id);
+  const lineupRows=gold('lineups').filter(row=>String(row.canonical_match_id)===id&&row.player_id!=null);
   const lineups:LineupTeam[]=[String(match.canonical_home_team_id),String(match.canonical_away_team_id)].map(id=>{
     const team=teamMap.get(id),rows=lineupRows.filter(row=>String(row.team_id)===id).map((row:Row)=>({id:String(row.player_id),name:playerName(row.player_id),position:row.position==null?null:String(row.position),shirtNumber:row.shirt_number==null?null:Number(row.shirt_number),starter:Boolean(row.starter)})).sort((a,b)=>(a.shirtNumber??99)-(b.shirtNumber??99));
     return {id,name:String(team?.canonical_team_name||team?.name||id),color:team?.color==null?null:String(team.color),starters:rows.filter(player=>player.starter),reserves:rows.filter(player=>!player.starter)};
   }).filter(team=>team.starters.length>0||team.reserves.length>0);
-  const rawStats=gold('match_statistics').filter(row=>String(row.canonical_match_id)===id);
+  const rawStats=gold('match_statistics').filter(row=>String(row.canonical_match_id)===id&&row.value!=null&&row.value!=='');
   const periodList:[string,string][]=[['summary','Resumo do jogo'],['first_half','1º tempo'],['second_half','2º tempo']];
   const statPeriods:StatPeriod[]=periodList.map(([period,label])=>{
     const rows=rawStats.filter(row=>period==='summary'?row.period==null:row.period===period),byMetric=new Map<string,MatchStat>();
     for(const row of rows){const stat=byMetric.get(String(row.statistic))||{key:String(row.statistic),homeValue:null,awayValue:null};if(String(row.team_id)===String(match.canonical_home_team_id))stat.homeValue=row.value;else if(String(row.team_id)===String(match.canonical_away_team_id))stat.awayValue=row.value;byMetric.set(stat.key,stat);}
     return {key:period,label,stats:[...byMetric.values()]};
-  }).filter(period=>period.stats.length>0);
-  const rawOdds=gold('odds').filter(row=>String(row.canonical_match_id)===id).sort((a:Row,b:Row)=>String(a.collected_at).localeCompare(String(b.collected_at)));
+  }).filter(period=>period.stats.some(stat=>statCategories.some(category=>category.stats.includes(stat.key))));
+  const rawOdds=gold('odds').filter(row=>String(row.canonical_match_id)===id&&row.price!=null&&row.price!==''&&!String(row.provider||'').toLowerCase().replace(/[\s_-]+/g,'').includes('draftkings')).sort((a:Row,b:Row)=>String(a.collected_at).localeCompare(String(b.collected_at)));
   const latestOdds=new Map<string,MatchOdd>();
-  for(const row of rawOdds){const odd:MatchOdd={provider:String(row.provider||'Fonte'),market:String(row.market||'mercado'),selection:String(row.selection||''),price:Number(row.price),collectedAt:String(row.collected_at||'')};if(Number.isFinite(odd.price))latestOdds.set(`${odd.provider}|${odd.market}|${odd.selection}`,odd);}
+  for(const row of rawOdds){const odd:MatchOdd={provider:String(row.provider||'Fonte'),market:String(row.market||'mercado'),selection:String(row.selection||''),price:Number(row.price),collectedAt:String(row.collected_at||'')};if(Number.isFinite(odd.price)&&odd.price>0)latestOdds.set(`${odd.provider}|${odd.market}|${odd.selection}`,odd);}
   const odds=[...latestOdds.values()].sort((a,b)=>a.provider.localeCompare(b.provider)||a.market.localeCompare(b.market)||a.selection.localeCompare(b.selection));
   const kickoff=Date.parse(String(match.kickoff_utc||match.kickoff_date||''));
   const preKickoffOdds=Number.isFinite(kickoff)?rawOdds.filter(row=>Date.parse(String(row.collected_at))<=kickoff).length:0;
