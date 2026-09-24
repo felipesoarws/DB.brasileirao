@@ -178,7 +178,7 @@ export function scorePredictions(matchId:string):MatchScoreForecast{
   let expectedAway=(awayAttack+homeDefense)/2;
   expectedHome=Math.max(.25,Math.min(4.2,expectedHome));
   expectedAway=Math.max(.25,Math.min(4.2,expectedAway));
-  const factorial=(n:number)=>n<2?1:n*factorial(n-1);
+  const factorial=(n:number):number=>n<2?1:n*factorial(n-1);
   const poisson=(goals:number,expected:number)=>Math.exp(-expected)*Math.pow(expected,goals)/factorial(goals);
   const scores:ScorePrediction[]=Array.from({length:11},(_,homeGoals)=>Array.from({length:11},(_,awayGoals)=>({homeGoals,awayGoals,probability:poisson(homeGoals,expectedHome)*poisson(awayGoals,expectedAway)})))
     .flat().sort((a,b)=>b.probability-a.probability).slice(0,5);
