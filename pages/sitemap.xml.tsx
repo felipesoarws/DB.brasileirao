@@ -15,7 +15,7 @@ export default function Sitemap(){return null}
 export const getServerSideProps:GetServerSideProps=async({res})=>{
   const entries=new Map<string,SitemapEntry>();
   const add=(path:string,priority:number,frequency:SitemapEntry['frequency'],lastmod?:string)=>entries.set(path,{path,priority,frequency,lastmod});
-  for(const path of ['/','/temporadas','/clubes','/partidas','/confrontos','/linha-do-tempo','/recordes','/sobre','/fontes','/privacidade','/termos','/cookies'])add(path,path==='/'?1:.8,'weekly');
+  for(const path of ['/','/temporadas','/clubes','/partidas','/confrontos','/linha-do-tempo','/simulacao','/recordes','/sobre','/fontes','/privacidade','/termos','/cookies'])add(path,path==='/'?1:.8,'weekly');
 
   const matches=gold('matches');
   const seasonUpdates=new Map<string,string>();

@@ -3,7 +3,7 @@ import {useRouter} from 'next/router';
 import {ReactNode,useEffect,useRef,useState} from 'react';
 
 type Theme='light'|'dark';
-const nav=[['⌘','Dashboard','/'],['▣','Temporadas','/temporadas'],['♙','Clubes','/clubes'],['○','Partidas','/partidas'],['⇄','Confrontos','/confrontos'],['◷','Linha do tempo','/linha-do-tempo'],['▥','Recordes','/recordes']];
+const nav=[['⌘','Dashboard','/'],['▣','Temporadas','/temporadas'],['♙','Clubes','/clubes'],['○','Partidas','/partidas'],['⇄','Confrontos','/confrontos'],['◷','Linha do tempo','/linha-do-tempo'],['▤','Simulação','/simulacao'],['▥','Recordes','/recordes']];
 
 function BrandMark(){return <span className="mark"><img src="/favicon.png?v=20260923" alt=""/></span>}
 

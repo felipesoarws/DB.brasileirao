@@ -311,6 +311,29 @@
 @keyframes mobile-overlay-out{from{opacity:1}to{opacity:0}}
 @media(prefers-reduced-motion:reduce){.drawer,.drawer.is-closing,.overlay,.overlay.is-closing{animation:none}}
 
+@media(max-width:900px){.season-simulation-layout{grid-template-columns:minmax(0,1fr)}}
+
+@media(max-width:680px){
+  .season-simulation{gap:10px}
+  .season-simulation-layout{grid-template-columns:minmax(0,1fr);gap:10px}
+  .season-simulation-fixtures,.season-simulation-standings{padding:13px 9px}
+  .season-simulation-standings .table-wrap{overflow-x:hidden}
+  .season-simulation-standings .standings-table table{min-width:0;width:100%;table-layout:fixed}
+  .season-simulation .statistics-section-heading{gap:8px}
+  .season-simulation .statistics-section-heading h2{font-size:14px;line-height:18px}
+  .season-simulation .statistics-section-heading .caption{font-size:10px;line-height:14px}
+  .season-simulation-score{gap:4px}
+  .season-simulation-score input{width:32px;height:31px;font-size:14px}
+  .season-simulation-match{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:3px;padding:8px 0}
+  .season-simulation-match>.team{gap:4px;font-size:9px}
+  .season-simulation-match>.team .club-mark{width:19px;height:19px}
+  .season-simulation-match>.season-simulation-score{min-width:74px;gap:3px}
+  .season-simulation-match .season-simulation-score input,.season-simulation-match .season-simulation-score-value{width:27px;height:29px;font-size:12px}
+  .season-simulation-round-nav{grid-template-columns:34px minmax(0,1fr) 34px;padding:8px;gap:6px}
+  .season-simulation-state{padding:4px 6px;font-size:9px}
+  .season-simulation-footnote{font-size:10px}
+}
+
 @media(max-width:680px){
   .page .table-wrap th:first-child,.page .table-wrap td:first-child{padding-left:12px!important}
   .page .table-wrap th:last-child,.page .table-wrap td:last-child{padding-right:12px!important}
