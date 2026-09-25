@@ -9,3 +9,5 @@
 .team:hover .team-name{color:var(--team-accent,var(--theme-brand-primary))}
 [data-theme="dark"] .team{--team-accent:color-mix(in srgb,var(--team,var(--theme-brand-primary)) 58%,#fff)}
 [data-theme="dark"] .club-record-name-link:hover{color:color-mix(in srgb,var(--team,var(--theme-brand-primary)) 58%,#fff)}
+.club-mark{background:transparent;border:0}
+.club-mark img{background:transparent;padding:0}

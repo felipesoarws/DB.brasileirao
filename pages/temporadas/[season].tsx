@@ -1,5 +1,5 @@
 import {GetServerSideProps} from 'next';
-import Link from 'next/link';
+import Link from '../../components/Link';
 import {useEffect,useState} from 'react';
 import {useRouter} from 'next/router';
 import {seasonAnalytics,seasonMatches,seasonRoundLeaders,standings,venueStandings} from '../../lib/data/queries';

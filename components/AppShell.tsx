@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from './Link';
 import {useRouter} from 'next/router';
 import {ReactNode,useEffect,useRef,useState} from 'react';
 
@@ -43,7 +43,7 @@ function Cookie(){
 
 function BackButton(){
   const router=useRouter();
-  const back=()=>{const path=router.pathname,destination=path==='/temporadas'||path==='/clubes'?'/':path.startsWith('/temporadas/')?'/temporadas':path.startsWith('/clubes/')?'/clubes':path.startsWith('/partidas/')?'/partidas':'/';void router.push(destination)};
+  const back=()=>{const path=router.pathname,destination=path==='/temporadas'||path==='/clubes'?'/':path.startsWith('/temporadas/')?'/temporadas':path.startsWith('/clubes/')?'/clubes':path.startsWith('/partidas/')?'/partidas':'/';window.location.assign(destination)};
   return <button className="page-back" type="button" onClick={back} aria-label="Voltar para a página anterior"><span aria-hidden="true">←</span><span>Voltar</span></button>;
 }
 

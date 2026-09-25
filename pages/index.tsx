@@ -1,5 +1,5 @@
 import type {GetServerSideProps} from 'next';
-import Link from 'next/link';
+import Link from '../components/Link';
 import {useState,type FocusEvent,type MouseEvent} from 'react';
 import {dashboard} from '../lib/data/queries';
 import {Header,Kpis,MatchTable,StandingsScope,StandingsTable,Team} from '../components/ui';
@@ -40,7 +40,7 @@ export default function Home({data}:any){
     </section>
     <section className="section grid2 analytics-grid">
       <div className="card chart-card"><h2>Média de gols por temporada</h2><p className="caption">Gols por jogo em todas as temporadas disponíveis.</p><GoalsBySeason rows={data.goalsBySeason}/></div>
-          <div className="card champions-card"><h2>Ranking de campeões</h2><p className="caption">Campeões brasileiros na era dos pontos corridos (desde 2003).</p><div className="champions-ranking">{[...titles.entries()].sort((a,b)=>b[1].length-a[1].length).slice(0,8).map(([id,years])=>{const c=data.champions.find((x:any)=>x.canonical_team_id===id);return <div className="champion-row" key={id}><Team id={id} name={c.canonical_team_name} color={c.color}/><div className="champion-title-years"><b className="numeric">{years.length}</b><small>{years.slice().sort((a,b)=>Number(a)-Number(b)).join(', ')}</small></div></div>})}</div></div>
+      <div className="card champions-card"><h2>Ranking de campeões</h2><p className="caption">Campeões brasileiros na era dos pontos corridos (desde 2003).</p><div className="champions-ranking">{[...titles.entries()].sort((a,b)=>b[1].length-a[1].length).slice(0,8).map(([id,years])=>{const c=data.champions.find((x:any)=>x.canonical_team_id===id);return <div className="champion-row" key={id}><Team id={id} name={c.canonical_team_name} color={c.color}/><div className="champion-title-years"><b className="numeric">{years.length}</b><small>{years.slice().sort((a,b)=>Number(a)-Number(b)).map((year,index)=><span key={year}>{index>0?', ':''}<Link href={`/temporadas/${year}`}>{year}</Link></span>)}</small></div></div>})}</div></div>
     </section>
   </>
 }

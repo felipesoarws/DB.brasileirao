@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from './Link';
 import Image from 'next/image';
 import {useRouter} from 'next/router';
 import {createPortal} from 'react-dom';
@@ -38,7 +38,7 @@ export function Team({id,name,color,reverse=false}:{id:string,name:string,color?
   const ini=words.map(x=>x[0]).slice(0,2).join('');
   const shortName=words.length>1?words.map(word=>word[0]).join('').toUpperCase():words[0]?.slice(0,3).toUpperCase()||'—';
   const hasTeam=id&&id!=='null'&&id!=='undefined';
-  const mark=<span className="club-mark">{ini}{hasTeam?<Image src={`/api/team-logo/${encodeURIComponent(id)}`} alt={`Escudo do ${displayName}`} width={36} height={36} sizes="36px" onError={e=>{e.currentTarget.style.display='none'}}/>:null}</span>;
+  const mark=<span className="club-mark">{ini}{hasTeam?<Image src={`/api/team-logo/${encodeURIComponent(id)}`} alt={`Escudo do ${displayName}`} width={144} height={144} sizes="72px" quality={95} onError={e=>{e.currentTarget.style.display='none'}}/>:null}</span>;
   const teamColor=color&&color.toUpperCase()!=='#FFFFFF'?(color.startsWith('#')?color:`#${color}`):'var(--theme-brand-primary)';
   return <Link href={hasTeam?`/clubes/${id}`:'#'} aria-disabled={!hasTeam} aria-label={displayName} className={`team ${reverse?'team-reverse':''}`} style={{'--team':teamColor} as any}>{reverse&&<><span className="team-name">{displayName}</span><span className="team-short-name" aria-hidden="true">{shortName}</span></>}{mark}{!reverse&&<><span className="team-name">{displayName}</span><span className="team-short-name" aria-hidden="true">{shortName}</span></>}</Link>;
 }

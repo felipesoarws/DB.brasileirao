@@ -48,6 +48,8 @@
 .club-hero-copy p strong{color:var(--club-accent);font-weight:600}
 .club-hero-copy .club-title-years{display:flex;align-items:center;gap:6px;margin-top:5px;color:var(--light-hex-78580b);font-size:12px;line-height:17px}
 .club-title-years strong{color:var(--light-hex-78580b);font-weight:650}
+.club-title-year-link{color:inherit;text-decoration:none;border-bottom:1px dotted currentColor;transition:opacity .15s ease}
+.club-title-year-link:hover{opacity:.72}
 .club-metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
 .club-metric{min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:12px 8px}
 .club-metric strong{font-size:24px;line-height:30px;font-weight:700;font-variant-numeric:tabular-nums}
@@ -64,10 +66,13 @@
 .club-chart-grid{stroke:var(--theme-border-control);stroke-width:1;stroke-dasharray:3 4}
 .club-chart-baseline{stroke:var(--border);stroke-width:1}
 .club-chart-axis,.club-chart-season{fill:var(--theme-text-muted);font-family:var(--font-geist),Arial,sans-serif;font-size:11px}
-.club-chart-line{fill:none;stroke:var(--club-accent);stroke-width:2}
+.club-chart-line{fill:none;stroke:var(--club-accent);stroke-width:2;stroke-dasharray:1;stroke-dashoffset:1;animation:club-chart-reveal 1.35s cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes club-chart-reveal{to{stroke-dashoffset:0}}
+@media(prefers-reduced-motion:reduce){.club-chart-line{stroke-dashoffset:0;animation:none}}
 .club-chart-point{fill:var(--club-accent)}
-.club-point-value{fill:var(--theme-text-secondary);font-family:var(--font-geist),Arial,sans-serif;font-size:10px;font-weight:500}
-.club-goals-bar{fill:var(--club-accent)}
+.club-goals-bar{fill:var(--club-accent);transform-box:fill-box;transform-origin:center bottom;animation:club-goals-grow .85s cubic-bezier(.22,.61,.36,1) both}
+@keyframes club-goals-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@media(prefers-reduced-motion:reduce){.club-goals-bar{animation:none}}
 .club-goals-value{fill:var(--theme-text-muted);font-family:var(--font-geist),Arial,sans-serif;font-size:11px}
 .club-history-list{width:100%;font-variant-numeric:tabular-nums}
 .club-history-list-head,.club-history-list-row{display:grid;grid-template-columns:minmax(100px,.65fr) minmax(0,2fr) minmax(48px,.4fr);align-items:center;gap:8px}
@@ -78,6 +83,7 @@
 .club-history-list-row:hover{background:color-mix(in srgb,var(--club-color) 4%,var(--theme-surface))}
 .club-history-list-row.is-current:not(.is-champion){background:var(--light-hex-f0f7ff);box-shadow:inset 3px 0 var(--light-hex-3b82f6)}
 .club-history-list-row.is-champion{background:var(--light-hex-fffbeb);box-shadow:inset 3px 0 var(--light-hex-d4a017)}
+.club-history-list-row.is-relegated:not(.is-champion){background:color-mix(in srgb,var(--light-hex-e11d48) 7%,var(--theme-surface));box-shadow:inset 3px 0 var(--light-hex-e11d48)}
 .club-history-list-row.is-current.is-champion{background:linear-gradient(90deg,var(--light-hex-eff6ff),var(--light-hex-fffbeb));box-shadow:inset 3px 0 var(--light-hex-a87908)}
 .club-history-season{display:flex;align-items:center;gap:10px}
 .club-history-season a{color:var(--club-accent);font-size:15px;font-weight:650;text-decoration:none}
@@ -86,6 +92,7 @@
 .club-history-flag{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
 .club-history-flag-current{padding:2px 6px;border-radius:999px;background:var(--light-hex-dbeafe);color:var(--light-hex-1d4ed8);font-size:10px;font-weight:600}
 .club-history-flag-champion{font-size:15px;line-height:18px}
+.club-history-flag-relegated{width:17px;height:17px;border-radius:50%;background:color-mix(in srgb,var(--light-hex-e11d48) 13%,var(--theme-surface));color:var(--light-hex-e11d48);font-size:12px;font-weight:750;line-height:1}
 .club-history-campaign{display:flex;align-items:center;gap:10px;min-width:0}
 .club-history-points{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
 .club-history-points strong{color:var(--club-accent);font-size:17px;line-height:22px}
@@ -356,6 +363,6 @@
   .standings-table col:nth-child(1){width:14%!important}.standings-table col:nth-child(2){width:31%!important}.standings-table col:nth-child(3),.standings-table col:nth-child(n+9){display:none}.standings-table col:nth-child(4){width:13%!important}.standings-table col:nth-child(5),.standings-table col:nth-child(6),.standings-table col:nth-child(7),.standings-table col:nth-child(8){width:10.5%!important}
   .standings-table th:nth-child(3),.standings-table td:nth-child(3),.standings-table th:nth-child(n+9),.standings-table td:nth-child(n+9){display:none}
   .standings-table th,.standings-table td{padding:7px 4px;white-space:nowrap}.standings-table th:first-child,.standings-table td:first-child{padding-left:9px;font-size:12px;font-weight:650}.standings-table th:nth-child(5),.standings-table td:nth-child(5),.standings-table th:nth-child(6),.standings-table td:nth-child(6),.standings-table th:nth-child(7),.standings-table td:nth-child(7),.standings-table th:nth-child(8),.standings-table td:nth-child(8){padding-right:7px;padding-left:7px;text-align:center}.standings-table .team{width:100%;min-width:0;gap:5px;justify-content:flex-start}.standings-table .team-name{display:inline;min-width:0;overflow:visible;text-overflow:clip;white-space:normal;font-size:11px;line-height:14px}.standings-table .team-short-name,.standings-zone-label{display:none}.standings-table .club-mark{width:19px;height:19px}.standings-table th:nth-child(n+4),.standings-table td:nth-child(n+4){font-size:10px}.standings-table th:nth-child(4),.standings-table td:nth-child(4){text-align:right;padding-right:9px}
-  .club-chart-scroll{flex-basis:340px;height:340px;min-height:340px}.club-chart{min-height:340px}.club-point-value{display:none}.club-chart-axis,.club-chart-season{font-size:10px}
+  .club-chart-scroll{flex-basis:340px;height:340px;min-height:340px}.club-chart{min-height:340px}.club-chart-axis,.club-chart-season{font-size:10px}
   .club-history-list-head,.club-history-list-row{grid-template-columns:minmax(0,1fr) auto auto;gap:6px;padding-right:5px;padding-left:5px}.club-history-list-head span:nth-child(2){display:none}.club-history-list-row{min-height:42px}.club-history-season{gap:4px}.club-history-season a{font-size:13px}.club-history-position{min-width:24px;padding:2px 4px;font-size:9px}.club-history-flag-champion{font-size:12px;line-height:14px}.club-history-campaign{justify-content:flex-end}.club-history-points{gap:2px}.club-history-points strong{font-size:15px;line-height:19px}.club-history-points>span,.club-history-results,.club-history-points small{display:none}.club-history-difference{gap:3px;font-size:10px}.club-history-difference strong{font-size:12px}
 }

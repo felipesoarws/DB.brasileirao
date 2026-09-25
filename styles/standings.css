@@ -209,6 +209,17 @@
   line-height: 14px;
   white-space: normal;
 }
+.champion-title-years small a,
+.record-season-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+  transition: opacity 150ms ease;
+}
+.champion-title-years small a:hover,
+.record-season-link:hover {
+  opacity: .72;
+}
 .btn {
   display: inline-flex;
   align-items: center;
@@ -795,6 +806,9 @@
   color: var(--theme-brand-primary);
   font-size: 15px;
   line-height: 2px;
+}
+.club-record-value.is-negative {
+  color: var(--light-hex-e11d48);
 }
 .club-record-leader > small {
   grid-column: 3/-1;

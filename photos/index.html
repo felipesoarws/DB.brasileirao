@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f3">
+  <title>BR.database — Carrossel para LinkedIn</title>
+  <style>
+    @font-face{font-family:Geist;src:url('../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2') format('woff2');font-style:normal;font-weight:100 900;font-display:swap}
+    @font-face{font-family:Geist Mono;src:url('../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2') format('woff2');font-style:normal;font-weight:100 900;font-display:swap}
+    :root{color-scheme:light;--ink:#17211b;--muted:#657169;--line:#dce5de;--paper:#f4f6f3;--green:#087a46;--deep:#10271b;--white:#fff}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 Geist,ui-sans-serif,system-ui,sans-serif}
+    .app{max-width:1440px;margin:0 auto;padding:36px 36px 64px}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:26px}.brand{display:flex;align-items:center;gap:12px}.mark{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:#fff;box-shadow:0 0 0 1px var(--line);overflow:hidden}.mark img{width:100%;height:100%;object-fit:contain}.brand strong{display:block;font-size:17px;letter-spacing:-.04em}.brand small,.subtle{color:var(--muted)}h1{margin:26px 0 4px;font-size:clamp(27px,4vw,42px);line-height:1.08;letter-spacing:-.055em}.intro{max-width:660px;margin:0;color:var(--muted)}.tools{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}.button{min-height:40px;padding:0 14px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font:inherit;font-size:13px;font-weight:650;cursor:pointer}.button:hover{border-color:#a7c4b1;background:#f7fbf8}.button.primary{background:var(--green);border-color:var(--green);color:#fff}.button.primary:hover{background:#06663b}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start}.preview{min-width:0;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 14px 38px #1835230b}.canvas-wrap{position:relative;overflow:hidden;border-radius:9px;background:#e9eee9;aspect-ratio:16/9}.canvas-wrap canvas{display:block;width:100%;height:100%}.side{padding:17px;border:1px solid var(--line);border-radius:14px;background:#fff}.side h2{margin:0 0 4px;font-size:16px;letter-spacing:-.025em}.side p{margin:0 0 14px;color:var(--muted);font-size:12px}.slides{display:grid;gap:7px}.slide-button{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:9px;align-items:center;width:100%;padding:9px;border:1px solid transparent;border-radius:9px;background:transparent;text-align:left;cursor:pointer}.slide-button:hover{background:#f4f7f4}.slide-button.active{border-color:#b4d0be;background:#f0f7f2}.slide-number{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;background:#e6eee8;color:var(--green);font-size:11px;font-weight:800}.slide-button b{display:block;font-size:12px}.slide-button small{display:block;color:var(--muted);font-size:10px}.download-one{border:0;background:transparent;color:var(--green);font-size:11px;font-weight:750;cursor:pointer}.under{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 3px 0;color:var(--muted);font-size:11px}.under span:last-child{font-variant-numeric:tabular-nums}.hint{margin-top:14px;padding:11px 12px;border-radius:10px;background:#f1f6f2;color:#506258;font-size:11px}.hint b{color:#263d2e}.mobile-warning{display:none}
+    @media(max-width:900px){.app{padding:22px 16px}.workspace{grid-template-columns:1fr}.side{order:2}.top{display:block}.tools{justify-content:flex-start;margin-top:16px}}
+    @media(max-width:560px){.under{align-items:flex-start;flex-direction:column}.mobile-warning{display:block;margin:10px 0 0;color:#7a5d16;font-size:11px}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <div>
+        <div class="brand"><span class="mark"><img src="../public/favicon.png" alt=""></span><span><strong>BR.database</strong><small>Carrossel de apresentação · LinkedIn</small></span></div>
+        <h1>O Brasileirão, visto por dados.</h1>
+        <p class="intro">Uma sequência de imagens para apresentar o projeto. Escolha um slide e baixe em PNG no formato desktop 16:9 (1200 × 675 px).</p>
+      </div>
+      <div class="tools"><button class="button" id="prev" type="button">← Anterior</button><button class="button" id="next" type="button">Próximo →</button><button class="button primary" id="download" type="button">Baixar este slide · PNG</button></div>
+    </header>
+    <section class="workspace" aria-label="Editor de carrossel">
+      <div class="preview">
+        <div class="canvas-wrap"><canvas id="slide" width="1200" height="675" aria-label="Prévia do slide selecionado"></canvas></div>
+        <div class="under"><span id="slide-title">Capa</span><span id="slide-count">01 / 06 · 1200 × 675</span></div>
+        <p class="mobile-warning">A imagem será exportada em resolução desktop 16:9, independente do tamanho desta prévia.</p>
+      </div>
+      <aside class="side">
+        <h2>Slides do carrossel</h2><p>Baixe cada arte em PNG para publicar ou montar um PDF no LinkedIn.</p>
+        <div class="slides" id="slides"></div>
+        <button class="button" id="downloadAll" type="button" style="width:100%;margin-top:13px">Baixar todos os PNGs</button>
+        <div class="hint"><b>Formato desktop:</b> 16:9, 1200 × 675 px.<br>Tipografia Geist, favicon e emblemas da base Gold. A edição 2026 aparece parcial.</div>
+      </aside>
+    </section>
+  </main>
+  <script>
+    const W=1200,H=675;
+    const pages=[
+      {title:'O Brasileirão, visto por dados.',tag:'BRASILEIRÃO SÉRIE A',kind:'cover',subtitle:'História, partidas e números do campeonato em um só lugar.'},
+      {title:'Uma visão geral do campeonato.',tag:'01 · VISÃO GERAL',kind:'home',subtitle:'Acompanhe a temporada atual e explore o panorama histórico.'},
+      {title:'Temporada por temporada.',tag:'02 · TEMPORADAS',kind:'season',subtitle:'Classificação, rodadas e estatísticas organizadas em contexto.'},
+      {title:'Cada clube tem uma história.',tag:'03 · CLUBES',kind:'clubs',subtitle:'Desempenho, campanhas, gols e evolução dos clubes.'},
+      {title:'Do calendário ao apito final.',tag:'04 · PARTIDAS',kind:'matches',subtitle:'Resultados e agenda em uma navegação simples e clara.'},
+      {title:'O jogo em todos os detalhes.',tag:'05 · DETALHE DA PARTIDA',kind:'detail',subtitle:'Estatísticas, escalações e lances-chave lado a lado.'}
+    ];
+    const canvas=document.getElementById('slide'),ctx=canvas.getContext('2d');let current=0;
+    const C={ink:'#17211b',muted:'#657169',line:'#dce5de',paper:'#f4f6f3',green:'#087a46',deep:'#10271b',white:'#fff',pale:'#eaf2ec',mint:'#c8e0d0',soft:'#f6f9f6',gold:'#d3a33d',red:'#b84d48'};
+    const teams={flamengo:{name:'Flamengo RJ',color:'#c60000',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/819.png'},palmeiras:{name:'Palmeiras',color:'#417505',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/2029.png'},'sao-paulo-fc':{name:'São Paulo',color:'#c60000',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/2026.png'},bahia:{name:'Bahia',color:'#1557a6',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/9967.png'},botafogo:{name:'Botafogo RJ',color:'#111',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/6086.png'},corinthians:{name:'Corinthians',color:'#292929',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/874.png'},fluminense:{name:'Fluminense',color:'#7e0202',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/3445.png'},cruzeiro:{name:'Cruzeiro',color:'#0093ec',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/2022.png'},santos:{name:'Santos',color:'#111',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/2674.png'},gremio:{name:'Grêmio',color:'#0093ec',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/6273.png'},athletico:{name:'Athletico-PR',color:'#d80518',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/3458.png'},bragantino:{name:'Bragantino',color:'#d71920',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/6079.png'},vitoria:{name:'Vitória',color:'#c6101c',logo:'https://a.espncdn.com/i/teamlogos/soccer/500/3457.png'}};
+    const logoImages=Object.fromEntries(Object.entries(teams).map(([id,team])=>{const image=new Image();image.crossOrigin='anonymous';image.onload=()=>render();image.src=team.logo;return[id,image]}));
+    const brandImage=new Image();brandImage.src='../public/favicon.png';brandImage.onload=()=>render();
+    const imageReady=image=>image.complete?Promise.resolve():new Promise(resolve=>{image.addEventListener('load',resolve,{once:true});image.addEventListener('error',resolve,{once:true})});
+    const assetsReady=Promise.all([document.fonts.load('500 16px Geist'),document.fonts.load('700 16px Geist'),...Object.values(logoImages).map(imageReady),imageReady(brandImage)]);
+    function rr(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
+    function text(str,x,y,size=16,color=C.ink,weight=500,align='left'){ctx.fillStyle=color;ctx.font=`${weight} ${size}px Geist, ui-sans-serif, system-ui, sans-serif`;ctx.textAlign=align;ctx.textBaseline='alphabetic';ctx.fillText(str,x,y)}
+    function line(x1,y1,x2,y2,color=C.line,width=1){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
+    function crest(id,x,y,size){const team=teams[id],image=logoImages[id];if(image?.complete&&image.naturalWidth){ctx.drawImage(image,x,y,size,size)}else if(team){ctx.beginPath();ctx.arc(x+size/2,y+size/2,size*.39,0,Math.PI*2);ctx.fillStyle=team.color;ctx.fill()}}
+    function base(p){ctx.clearRect(0,0,W,H);ctx.fillStyle=C.paper;ctx.fillRect(0,0,W,H);ctx.fillStyle=C.green;ctx.fillRect(0,0,8,H);rr(56,43,40,40,12,C.white,C.line);if(brandImage.complete&&brandImage.naturalWidth)ctx.drawImage(brandImage,60,47,32,32);else text('BR',76,69,14,C.green,850,'center');text('BR.database',108,70,17,C.ink,750);text(p.tag,56,138,11,C.green,750);text(p.title,56,191,36,C.ink,760);text(p.subtitle,56,220,15,C.muted,450);text('PROJETO INDEPENDENTE · BRASILEIRÃO SÉRIE A',56,644,9,C.muted,600);text(String(current+1).padStart(2,'0'),1144,615,22,C.green,760,'right');text(String(pages.length).padStart(2,'0'),1144,633,9,C.muted,600,'right');line(56,602,1144,602,C.line,1)}
+    function pill(label,x,y,w=85){rr(x,y,w,27,13,C.pale);text(label,x+w/2,y+18,10,C.green,700,'center')}
+    function table(x,y,w,rows,headers=['POS','CLUBE','PTS','J','SG']){rr(x,y,w,rows.length*42+43,13,C.white,C.line);ctx.fillStyle=C.soft;ctx.fillRect(x+1,y+1,w-2,40);text(headers[0],x+17,y+26,9,C.muted,700);text(headers[1],x+81,y+26,9,C.muted,700);text(headers[2],x+w-172,y+26,9,C.muted,700,'right');text(headers[3],x+w-98,y+26,9,C.muted,700,'right');text(headers[4],x+w-22,y+26,9,C.muted,700,'right');const rows2026=[['flamengo',60,28,'+32'],['palmeiras',57,28,'+26'],['athletico',49,28,'+11'],['fluminense',48,28,'+8'],['bahia',46,28,'+8']];rows.forEach((_,i)=>{const row=rows2026[i%rows2026.length],yy=y+43+i*42;line(x+1,yy+41,x+w-1,yy+41);text(String(i+1).padStart(2,'0'),x+17,yy+26,11,C.muted,600);crest(row[0],x+79,yy+7,26);text(teams[row[0]].name,x+111,yy+25,12,C.ink,580);text(String(row[1]),x+w-172,yy+26,12,C.ink,700,'right');text(String(row[2]),x+w-98,yy+26,11,C.muted,500,'right');text(row[3],x+w-22,yy+26,11,C.green,650,'right')})}
+    const goalAverages=[2.89,2.78,3.13,2.71,2.76,2.72,2.88,2.57,2.68,2.47,2.46,2.26,2.36,2.41,2.43,2.18,2.31,2.48,2.22,2.38,2.49,2.44,2.52,2.67];
+    function chart(x,y,w,h,type='bar'){rr(x,y,w,h,14,C.white,C.line);text(type==='line'?'MÉDIA DE GOLS POR TEMPORADA':'MÉDIA DE GOLS POR TEMPORADA',x+20,y+27,10,C.muted,700);text('Gols por partida · 2003—2026',x+20,y+45,9,C.muted,450);const gx=x+25,gy=y+61,gw=w-50,gh=h-96;for(let i=0;i<4;i++)line(gx,gy+i*gh/3,gx+gw,gy+i*gh/3,'#e9eeea',1);const min=1.8,max=3.4,vals=goalAverages;if(type==='line'){ctx.beginPath();vals.forEach((v,i)=>{const px=gx+i*gw/(vals.length-1),py=gy+gh-(v-min)/(max-min)*gh;i?ctx.lineTo(px,py):ctx.moveTo(px,py)});ctx.strokeStyle=C.green;ctx.lineWidth=3;ctx.stroke();vals.forEach((v,i)=>{ctx.beginPath();ctx.arc(gx+i*gw/(vals.length-1),gy+gh-(v-min)/(max-min)*gh,2.7,0,Math.PI*2);ctx.fillStyle=C.green;ctx.fill()})}else vals.forEach((v,i)=>{const bw=gw/vals.length*.6,bx=gx+i*gw/vals.length+(gw/vals.length-bw)/2,bh=(v-min)/(max-min)*gh;rr(bx,gy+gh-bh,bw,bh,3,i===vals.length-1?C.green:'#7caf8c')});[2003,2009,2015,2021,2026].forEach((year,i)=>{const px=gx+(year-2003)/23*gw;text(String(year),px,gy+gh+18,8,C.muted,500,i===0?'left':i===4?'right':'center')})}
+    function metric(x,y,w,label,val){rr(x,y,w,78,12,C.white,C.line);text(label.toUpperCase(),x+15,y+24,9,C.muted,700);text(val,x+15,y+57,23,C.ink,750)}
+    function draw(p){base(p);if(p.kind==='cover'){rr(680,270,430,255,26,C.deep);ctx.fillStyle='#143c27';ctx.beginPath();ctx.arc(1000,300,160,0,Math.PI*2);ctx.fill();ctx.globalAlpha=.42;ctx.beginPath();ctx.arc(1000,300,104,0,Math.PI*2);ctx.fillStyle='#2e8952';ctx.fill();ctx.globalAlpha=1;text('BR',894,405,68,C.white,850,'center');line(56,292,520,292,C.line,1);text('DADOS PARA QUEM',56,333,13,C.green,750);text('VIVE O FUTEBOL.',56,359,13,C.green,750);text('Explore o campeonato.',56,414,20,C.ink,650);text('Entenda cada temporada.',56,446,20,C.ink,650);pill('HISTÓRICO',56,490,94);pill('ESTATÍSTICAS',159,490,105);pill('CLUBES',273,490,75)}
+      if(p.kind==='home'){metric(56,260,245,'TEMPORADAS','Histórico');metric(315,260,245,'PARTIDAS','Agenda + resultados');metric(574,260,245,'CLUBES','Série A');metric(833,260,311,'NÚMEROS','Em contexto');chart(56,355,510,214,'bar');table(590,355,554,[1,2,3,4])}
+      if(p.kind==='season'){table(56,260,520,[1,2,3,4,5],['POS','CLUBE','PTS','J','SG']);chart(596,260,548,255,'line');rr(56,525,1088,48,10,C.pale);text('Classificação total, em casa e fora · rodadas · líderes por rodada',78,555,13,C.green,650)}
+      if(p.kind==='clubs'){const names=['Flamengo','Palmeiras','São Paulo','Bahia','Botafogo','Corinthians'];const colors=['#b42328','#168451','#e3262e','#1557a6','#252525','#b62940'];names.forEach((name,i)=>{const x=56+(i%3)*365,y=260+Math.floor(i/3)*135;rr(x,y,340,110,14,C.white,C.line);rr(x+17,y+18,54,54,17,colors[i]);text(name.slice(0,1),x+44,y+54,22,C.white,800,'center');text(name,x+86,y+42,16,C.ink,700);text('Perfil · campanhas · desempenho',x+86,y+66,10,C.muted,450);line(x+18,y+84,x+322,y+84);text('Histórico por temporada',x+18,y+101,9,C.green,650)});rr(56,540,1070,40,10,C.pale);text('Veja gols, aproveitamento e desempenho em casa e fora.',76,566,12,C.green,650)}
+      if(p.kind==='matches'){rr(56,260,1088,314,14,C.white,C.line);ctx.fillStyle=C.soft;ctx.fillRect(57,261,1086,44);['DATA','RODADA','MANDANTE','PLACAR','VISITANTE','STATUS'].forEach((h,i)=>text(h,[76,246,359,651,758,1031][i],288,9,C.muted,700));const matches=[['20 SET · 16:00','28','Flamengo','2 — 1','Bahia','Finalizada'],['20 SET · 18:30','28','Corinthians','1 — 0','Palmeiras','Finalizada'],['21 SET · 19:00','29','São Paulo','—','Botafogo','Agendada'],['22 SET · 20:00','29','Cruzeiro','—','Santos','Agendada'],['23 SET · 21:30','30','Fluminense','—','Grêmio','Agendada']];matches.forEach((row,i)=>{const y=337+i*48;line(57,y+17,1143,y+17);row.forEach((v,j)=>text(v,[76,246,359,651,758,1031][j],y,11,j===3?C.ink:j===5&&v==='Finalizada'?C.green:C.muted,j===3?700:500,j===3?'center':'left'))});pill('TEMPORADA',56,543,100);pill('SITUAÇÃO',166,543,90);pill('CLUBE',266,543,70)}
+      if(p.kind==='detail'){rr(56,260,1088,91,15,C.white,C.line);text('SÃO PAULO',321,298,12,C.ink,700,'center');text('1 — 0',600,317,30,C.ink,800,'center');text('FLAMENGO',879,298,12,C.ink,700,'center');pill('BRASILEIRÃO · RODADA',514,328,172);rr(56,373,704,201,14,C.white,C.line);text('ESTATÍSTICAS DA PARTIDA',76,402,10,C.muted,700);['Posse de bola','Finalizações','Escanteios','Passes certos'].forEach((s,i)=>{const y=438+i*32;text(['54%','14','6','412'][i],78,y,11,C.green,700);text(s,408,y,11,C.ink,600,'center');text(['46%','10','3','365'][i],739,y,11,C.green,700,'right');line(76,y+9,740,y+9,'#e9eeea')});rr(782,373,362,201,14,C.white,C.line);text('LANCES-CHAVE',803,402,10,C.muted,700);line(962,423,962,546,'#c8d8cd',2);[['18′','Gol'],['45+2′','Intervalo'],['72′','Cartão amarelo'],['86′','Gol']].forEach((v,i)=>{const y=435+i*34;ctx.beginPath();ctx.arc(962,y,5,0,Math.PI*2);ctx.fillStyle=i===0||i===3?C.green:C.gold;ctx.fill();text(v[0],943,y+4,9,C.muted,600,'right');text(v[1],980,y+4,10,C.ink,550)})}
+    }
+    function draw(p){
+      base(p);
+      if(p.kind==='cover'){
+        text('Da história à rodada.',56,326,39,C.ink,760);text('Tudo se conecta.',56,372,39,C.green,760);
+        text('Temporadas · clubes · jogos · estatísticas',58,415,16,C.muted,500);line(58,449,530,449,C.line,1);
+        text('Explore campanhas, compare desempenhos',58,482,15,C.ink,600);text('e reveja cada partida em detalhe.',58,506,15,C.ink,600);
+        pill('HISTÓRICO',58,542,94);pill('ESTATÍSTICAS',162,542,108);pill('CLUBES',278,542,75);
+        rr(658,254,486,321,26,C.deep);ctx.save();ctx.beginPath();ctx.roundRect(658,254,486,321,26);ctx.clip();ctx.fillStyle='#17452e';ctx.fillRect(658,254,486,321);
+        for(let i=0;i<8;i++){ctx.beginPath();ctx.ellipse(902,414,126+i*32,60+i*26,0,0,Math.PI*2);ctx.strokeStyle=`rgba(191,225,202,${.20-i*.018})`;ctx.lineWidth=1;ctx.stroke()}
+        line(658,414,1144,414,'#bfe1ca55',1);ctx.beginPath();ctx.arc(902,414,59,0,Math.PI*2);ctx.strokeStyle='#bfe1ca55';ctx.stroke();ctx.restore();
+        rr(866,289,73,73,22,'#ffffff20','#ffffff38');rr(866,466,73,73,22,'#ffffff20','#ffffff38');crest('flamengo',877,300,51);crest('palmeiras',877,477,51);
+        text('FLAMENGO RJ',958,328,13,C.white,650);text('PALMEIRAS',958,505,13,C.white,650);rr(850,385,105,58,18,'#fff');text('×',902,424,29,C.green,650,'center');pill('BRASILEIRÃO 2026',861,555,144);
+      }
+      if(p.kind==='home'){
+        metric(56,252,245,'TEMPORADAS','24');metric(315,252,245,'PARTIDAS','9.546');metric(574,252,245,'GOLS MARCADOS','24.213');metric(833,252,311,'MÉDIA · GOLS/JOGO','2,56');
+        chart(56,347,510,244,'bar');table(590,347,554,[1,2,3,4,5]);
+        text('Visão histórica + temporada atual',76,576,10,C.muted,550);text('Classificação após 28 jogos · 2026',1120,576,10,C.muted,550,'right');
+      }
+      if(p.kind==='season'){
+        text('CLASSIFICAÇÃO PARCIAL · APÓS 28 JOGOS',57,250,10,C.muted,700);table(56,260,650,[1,2,3,4,5],['POS','CLUBE','PTS','J','SG']);chart(728,260,416,255,'line');
+        rr(56,533,1088,46,11,C.pale);text('Total · Casa · Fora',77,561,12,C.green,700);text('Rodadas, jogos e líderes',1098,561,12,C.ink,550,'right');
+      }
+      if(p.kind==='clubs'){
+        const ids=['flamengo','palmeiras','sao-paulo-fc','bahia','botafogo','corinthians'];
+        ids.forEach((id,i)=>{const team=teams[id],x=56+(i%3)*365,y=260+Math.floor(i/3)*135;rr(x,y,340,110,14,C.white,C.line);rr(x+1,y+1,5,108,3,team.color);crest(id,x+20,y+21,54);text(team.name,x+91,y+43,16,C.ink,700);text('Perfil · campanhas · desempenho',x+91,y+66,10,C.muted,450);line(x+20,y+83,x+322,y+83);text(['Títulos e história','Aproveitamento','Gols por temporada'][i%3],x+20,y+101,9,C.green,650)});
+        rr(56,540,1070,40,10,C.pale);text('Acompanhe cada clube dentro e fora de campo.',76,566,12,C.green,650);
+      }
+      if(p.kind==='matches'){
+        rr(56,260,1088,314,14,C.white,C.line);ctx.fillStyle=C.soft;ctx.fillRect(57,261,1086,44);
+        ['DATA','RODADA','MANDANTE','PLACAR','VISITANTE','STATUS'].forEach((h,i)=>text(h,[76,246,359,686,790,1031][i],288,9,C.muted,700));
+        const matches=[['20 SET · 19:30','28','athletico','2 — 1','bahia'],['20 SET · 18:30','28','flamengo','2 — 1','bragantino'],['20 SET · 16:00','28','corinthians','1 — 3','fluminense'],['20 SET · 16:00','28','vitoria','1 — 3','cruzeiro'],['20 SET · 11:00','28','gremio','0 — 0','palmeiras']];
+        matches.forEach((row,i)=>{const y=337+i*48;line(57,y+17,1143,y+17);text(row[0],76,y,11,C.muted,500);text(row[1],246,y,11,C.ink,600);crest(row[2],350,y-19,28);text(teams[row[2]].name,384,y,11,C.ink,550);text(row[3],728,y,12,C.ink,750,'center');crest(row[4],778,y-19,28);text(teams[row[4]].name,812,y,11,C.ink,550);pill('FINALIZADA',1027,y-20,93)});
+        pill('TEMPORADA 2026',56,543,126);pill('RODADA 28',190,543,95);text('Da mais recente à mais antiga',1140,562,10,C.muted,500,'right');
+      }
+      if(p.kind==='detail'){
+        rr(56,260,1088,91,15,C.white,C.line);crest('sao-paulo-fc',323,275,52);text('SÃO PAULO',390,299,13,C.ink,700);text('2 — 1',600,317,30,C.ink,800,'center');crest('flamengo',826,275,52);text('FLAMENGO RJ',894,299,13,C.ink,700);pill('29 JAN · RODADA 1',514,328,116);
+        rr(56,373,704,201,14,C.white,C.line);text('ESTATÍSTICAS DA PARTIDA',76,402,10,C.muted,700);crest('sao-paulo-fc',217,383,27);crest('flamengo',505,383,27);
+        [['Posse de bola','40,8%','59,2%'],['Chutes no gol','4','5'],['Escanteios','2','6'],['Passes','379','542']].forEach((s,i)=>{const y=438+i*32;text(s[1],78,y,11,C.green,700);text(s[0],408,y,11,C.ink,600,'center');text(s[2],739,y,11,C.green,700,'right');line(76,y+9,740,y+9,'#e9eeea')});
+        rr(782,373,362,201,14,C.white,C.line);text('LANCES-CHAVE',803,402,10,C.muted,700);line(962,423,962,546,'#c8d8cd',2);
+        [['54′','Gol','flamengo'],['61′','Gol','sao-paulo-fc'],['71′','Gol','sao-paulo-fc'],['90+9′','Cartão vermelho','flamengo']].forEach((v,i)=>{const y=435+i*34;ctx.beginPath();ctx.arc(962,y,5,0,Math.PI*2);ctx.fillStyle=i===3?C.red:C.green;ctx.fill();text(v[0],943,y+4,9,C.muted,600,'right');crest(v[2],976,y-12,23);text(v[1],1005,y+4,10,C.ink,550)});
+      }
+    }
+    function render(){const p=pages[current];draw(p);document.getElementById('slide-title').textContent=p.title;document.getElementById('slide-count').textContent=`${String(current+1).padStart(2,'0')} / ${String(pages.length).padStart(2,'0')} · 1200 × 675`;document.querySelectorAll('.slide-button').forEach((b,i)=>b.classList.toggle('active',i===current))}
+    async function download(i){await assetsReady;current=i;render();const a=document.createElement('a');a.download=`br-database-linkedin-${String(i+1).padStart(2,'0')}.png`;a.href=canvas.toDataURL('image/png');a.click()}
+    const list=document.getElementById('slides');pages.forEach((p,i)=>{const b=document.createElement('button');b.className='slide-button';b.type='button';b.innerHTML=`<span class="slide-number">${String(i+1).padStart(2,'0')}</span><span><b>${p.title}</b><small>${p.tag}</small></span><span class="download-one" role="button" tabindex="0" aria-label="Baixar ${p.title}">PNG</span>`;b.addEventListener('click',e=>{if(e.target.classList.contains('download-one')){e.stopPropagation();download(i)}else{current=i;render()}});list.append(b)});
+    document.getElementById('prev').onclick=()=>{current=(current+pages.length-1)%pages.length;render()};document.getElementById('next').onclick=()=>{current=(current+1)%pages.length;render()};document.getElementById('download').onclick=()=>download(current);document.getElementById('downloadAll').onclick=async()=>{await assetsReady;for(let i=0;i<pages.length;i++){await download(i);await new Promise(resolve=>setTimeout(resolve,500))}};window.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){current=(current+1)%pages.length;render()}if(e.key==='ArrowLeft'){current=(current+pages.length-1)%pages.length;render()}});render();assetsReady.then(render);
+  </script>
+</body>
+</html>

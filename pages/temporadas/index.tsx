@@ -1,5 +1,5 @@
 import type {GetServerSideProps} from 'next';
-import Link from 'next/link';
+import Link from '../../components/Link';
 import {gold,isFinished,latestSeason,seasons,type Row} from '../../lib/data/gold';
 import {standings} from '../../lib/data/queries';
 import {Header as PageHeader,Team} from '../../components/ui';

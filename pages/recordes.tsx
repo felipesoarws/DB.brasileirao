@@ -1,5 +1,5 @@
 import type { GetServerSideProps } from "next";
-import Link from "next/link";
+import Link from "../components/Link";
 import {
   gold,
   isFinished,
@@ -78,9 +78,9 @@ function ClubRecordCard({ record }: { record: ClubRecord }) {
               >
                 {leader.teamName}
               </Link>
-              <strong className="club-record-value numeric">{value}</strong>
-              <small>
-                {leader.years.length ? leader.years.join(" · ") : leader.season}
+              <strong className={`club-record-value numeric${record.key === "worst-goal-difference" || record.key === "most-goals-against" ? " is-negative" : ""}`}>{value}</strong>
+              <small className="record-season-years">
+                {(leader.years.length ? leader.years : leader.season == null ? [] : [leader.season]).map((year,yearIndex)=><span key={`${year}-${yearIndex}`}>{yearIndex>0?' · ':''}<Link className="record-season-link" href={`/temporadas/${year}`}>{year}</Link></span>)}
               </small>
             </div>
           );
@@ -127,28 +127,17 @@ function MatchRecordCard({
                   alt=""
                 />
               </span>
-              <span className="club-record-name">
-                {record.homeName} × {record.awayName}
-              </span>
+              {record.matchId?<Link className="club-record-name club-record-name-link" href={`/partidas/${record.matchId}`}>{record.homeName} × {record.awayName}</Link>:<span className="club-record-name">{record.homeName} × {record.awayName}</span>}
               <strong className="club-record-value numeric">
                 {record.value}
               </strong>
               <small>
-                {record.homeScore}–{record.awayScore} · {record.season}
+                {record.homeScore}–{record.awayScore} · <Link className="record-season-link" href={`/temporadas/${record.season}`}>{record.season}</Link>
               </small>
             </>
           );
-          return record.matchId ? (
-            <Link
-              className="club-record-leader record-match-leader"
-              href={`/partidas/${record.matchId}`}
-              aria-label={`${record.homeName} ${record.homeScore} a ${record.awayScore} ${record.awayName}, temporada ${record.season}`}
-              key={record.id}
-            >
-              {content}
-            </Link>
-          ) : (
-            <div className="club-record-leader" key={record.id}>
+          return (
+            <div className="club-record-leader record-match-leader" key={record.id}>
               {content}
             </div>
           );

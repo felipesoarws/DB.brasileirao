@@ -1,5 +1,5 @@
 import type {GetServerSideProps} from 'next';
-import Link from 'next/link';
+import Link from '../../components/Link';
 import {useEffect,useRef,useState,type CSSProperties,type FocusEvent,type MouseEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {gold,isFinished,latestSeason,Row} from '../../lib/data/gold';
@@ -7,7 +7,7 @@ import {teamMatches as getTeamMatches} from '../../lib/data/queries';
 import Seo from '../../components/Seo';
 import {absoluteUrl,SITE_NAME} from '../../lib/site';
 
-type SeasonRow={season:number;points:number;played:number;won:number;drawn:number;lost:number;gf:number;ga:number;position:number|null;percentage:number};
+type SeasonRow={season:number;points:number;played:number;won:number;drawn:number;lost:number;gf:number;ga:number;position:number|null;percentage:number;relegated:boolean};
 type GoalsRow={season:string;average:number;games:number};
 type ChartPoint=SeasonRow&{x:number;y:number};
 type VenueStats={played:number;wins:number;draws:number;losses:number;goalsFor:number;goalsAgainst:number;points:number;percentage:number};
@@ -92,7 +92,7 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
     <div className="club-detail" style={{'--club-color':color} as React.CSSProperties}>
       <header className="club-hero card">
         <img className="club-hero-logo" src={`/api/team-logo/${encodeURIComponent(team.canonical_team_id)}`} alt={`Escudo do ${team.name}`} onError={event=>{event.currentTarget.style.visibility='hidden'}}/>
-        <div className="club-hero-copy"><h1>{team.name}</h1><p><strong>{stats.seasons}</strong> {stats.seasons===1?'temporada':'temporadas'} no Brasileirão</p>{championYears.length>0&&<p className="club-title-years"><span aria-hidden="true">🏆</span><span>Campeão em <strong>{championYears.join(', ')}</strong></span></p>}</div>
+        <div className="club-hero-copy"><h1>{team.name}</h1><p><strong>{stats.seasons}</strong> {stats.seasons===1?'temporada':'temporadas'} no Brasileirão</p>{championYears.length>0&&<p className="club-title-years"><span aria-hidden="true">🏆</span><span>Campeão em <strong>{championYears.map((year,index)=><span key={year}>{index>0?', ':''}<Link className="club-title-year-link" href={`/temporadas/${year}`}>{year}</Link></span>)}</strong></span></p>}</div>
       </header>
 
       <section className="club-metrics" aria-label="Estatísticas gerais">
@@ -112,8 +112,8 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
           {points.length?<div className="club-chart-scroll" ref={chartContainerRef}><svg className="club-chart" viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="none" role="group" aria-label="Gráfico de aproveitamento percentual por temporada">
             {[0,25,50,75,100].map(value=>{const y=pad.top+plotHeight-(value/100)*plotHeight;return <g key={value}><line className={value===0?'club-chart-baseline':'club-chart-grid'} x1={pad.left} y1={y} x2={chartWidth-pad.right} y2={y}/><text className="club-chart-axis" x={pad.left-8} y={y+4} textAnchor="end">{value}</text></g>})}
             {visibleSeasonAxis.map(item=><text className="club-chart-season" key={item.season} x={item.x} y={chartHeight-12} textAnchor="middle">{item.season}</text>)}
-            {points.length>1&&<polyline className="club-chart-line" points={line}/>}
-            {points.map(point=><g key={point.season}><circle className="club-chart-point" cx={point.x} cy={point.y} r="4" tabIndex={0} aria-label={`${point.season}: ${point.percentage}% de aproveitamento`} onMouseEnter={event=>openPopover(event,'points',point)} onMouseLeave={closePopover} onFocus={event=>openPopover(event,'points',point)} onBlur={closePopover}><title>{point.season}: {point.percentage}%</title></circle><text className="club-point-value" x={point.x} y={point.y-pad.top<18?point.y+16:point.y-9} textAnchor="middle">{Math.round(point.percentage)}%</text></g>)}
+            {points.length>1&&<polyline className="club-chart-line" points={line} pathLength={1}/>}
+            {points.map(point=><g key={point.season}><circle className="club-chart-point" cx={point.x} cy={point.y} r="4" tabIndex={0} aria-label={`${point.season}: ${point.percentage}% de aproveitamento`} onMouseEnter={event=>openPopover(event,'points',point)} onMouseLeave={closePopover} onFocus={event=>openPopover(event,'points',point)} onBlur={closePopover}><title>{point.season}: {point.percentage}%</title></circle></g>)}
           </svg></div>:<p className="club-empty">Não há temporadas disponíveis para este clube.</p>}
         </section>
 
@@ -144,8 +144,8 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
             <h2 id="club-history-title">Histórico por temporada</h2>
             {history.length?<div className="club-history-list" role="list" aria-label="Campanhas do clube por temporada">
               <div className="club-history-list-head" aria-hidden="true"><span>Temporada</span><span>Campanha</span><span>Saldo</span></div>
-              {history.map(row=>{const difference=row.gf-row.ga,season=String(row.season),isCurrent=season===currentSeason,isChampion=championYears.includes(season);return <div className={`club-history-list-row${isCurrent?' is-current':''}${isChampion?' is-champion':''}`} key={row.season} role="listitem">
-                <div className="club-history-season"><Link href={`/temporadas/${row.season}`}>{row.season}</Link><span className="club-history-position">{row.position?`${row.position}º`:'—'}</span>{isChampion&&<span className="club-history-flag club-history-flag-champion" role="img" aria-label="Campeão brasileiro" title="Campeão brasileiro">🏆</span>}</div>
+              {history.map(row=>{const difference=row.gf-row.ga,season=String(row.season),isCurrent=season===currentSeason,isChampion=championYears.includes(season);return <div className={`club-history-list-row${isCurrent?' is-current':''}${isChampion?' is-champion':''}${row.relegated?' is-relegated':''}`} key={row.season} role="listitem" aria-label={`${row.season}: ${row.position?`${row.position}º lugar`: 'posição não definida'}${isChampion?', campeão brasileiro':''}${row.relegated?', rebaixado para a Série B':''}`}>
+                <div className="club-history-season"><Link href={`/temporadas/${row.season}`}>{row.season}</Link><span className="club-history-position">{row.position?`${row.position}º`:'—'}</span>{isChampion&&<span className="club-history-flag club-history-flag-champion" role="img" aria-label="Campeão brasileiro" title="Campeão brasileiro">🏆</span>}{row.relegated&&<span className="club-history-flag club-history-flag-relegated" role="img" aria-label="Rebaixado para a Série B" title="Rebaixado para a Série B">↓</span>}</div>
                 <div className="club-history-campaign"><div className="club-history-points"><strong>{row.points}</strong><span>PTS</span><small>{row.played} jogos</small></div><div className="club-history-results" aria-label={`${row.won} vitórias, ${row.drawn} empates, ${row.lost} derrotas`}><span className="club-cell-win">{row.won}V</span><span className="club-cell-draw">{row.drawn}E</span><span className="club-cell-loss">{row.lost}D</span></div></div>
                 <div className={`club-history-difference ${difference>0?'is-positive':difference<0?'is-negative':''}`}><strong>{difference>0?'+':''}{difference}</strong><span>SG</span></div>
               </div>})}
@@ -162,13 +162,18 @@ export const getServerSideProps:GetServerSideProps<ClubPageProps>=async({params}
   const teamId=String(params?.teamId||'');
   const team=gold('teams').find(row=>String(row.canonical_team_id)===teamId);
   if(!team)return {notFound:true};
-  const history=gold('season_standings').filter(row=>String(row.team_id||row.canonical_team_id)===teamId).map((row:Row)=>{
+  const current=latestSeason();
+  const allStandings=gold('season_standings');
+  const teamsBySeason=new Map<string,number>();
+  for(const row of allStandings){const season=String(row.season);if(row.position!=null)teamsBySeason.set(season,(teamsBySeason.get(season)||0)+1);}
+  const history=allStandings.filter(row=>String(row.team_id||row.canonical_team_id)===teamId).map((row:Row)=>{
     const played=metric(row.played),won=metric(row.won??row.wins),drawn=metric(row.drawn??row.draws),lost=metric(row.lost??row.losses),gf=metric(row.gf??row.goals_for),ga=metric(row.ga??row.goals_against),points=metric(row.points);
-    return {season:metric(row.season),points,played,won,drawn,lost,gf,ga,position:row.position==null?null:metric(row.position),percentage:played?Math.round(points/(played*3)*1000)/10:0};
+    const season=metric(row.season),position=row.position==null?null:metric(row.position),teamCount=teamsBySeason.get(String(season))||20;
+    const relegated=current!=null&&season<Number(current)&&position!=null&&position>teamCount-4;
+    return {season,points,played,won,drawn,lost,gf,ga,position,percentage:played?Math.round(points/(played*3)*1000)/10:0,relegated};
   }).sort((a,b)=>b.season-a.season);
   const goalsBySeason:GoalsRow[]=gold('analytics/team_season_stats').filter(row=>String(row.team_id||row.canonical_team_id)===teamId&&Number(row.played)>0).map(row=>({season:String(row.season),average:Number((metric(row.goals_for)/metric(row.played)).toFixed(2)),games:metric(row.played)})).sort((a,b)=>a.season.localeCompare(b.season));
   const championYears=gold('season_champions').filter(row=>String(row.team_id||row.canonical_team_id)===teamId).map(row=>String(row.season)).sort((a,b)=>Number(a)-Number(b));
-  const current=latestSeason();
   const now=Date.now();
   const teamMatches=getTeamMatches(teamId);
   const currentSeasonMatches=teamMatches.filter(match=>String(match.season)===String(current)&&isFinished(match)&&match.home_score!=null&&match.away_score!=null);
