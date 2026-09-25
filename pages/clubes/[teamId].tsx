@@ -1,6 +1,7 @@
 import type {GetServerSideProps} from 'next';
 import Link from 'next/link';
 import {useEffect,useRef,useState,type CSSProperties,type FocusEvent,type MouseEvent} from 'react';
+import {createPortal} from 'react-dom';
 import {gold,isFinished,latestSeason,Row} from '../../lib/data/gold';
 import {teamMatches as getTeamMatches} from '../../lib/data/queries';
 import Seo from '../../components/Seo';
@@ -152,7 +153,7 @@ export default function ClubPage({team,stats,history,goalsBySeason,championYears
           </section>
         </div>
       </div>
-      {hovered&&<div className={`form-popover goals-popover ${hovered.below?'form-popover-below':''}`} style={{left:hovered.left,top:hovered.below?hovered.top+30:undefined,bottom:hovered.below?undefined:`calc(100vh - ${hovered.top}px + 9px)`}} role="tooltip"><div className="form-popover-heading"><span>TEMPORADA {hovered.row.season}</span><span className="form-popover-result goals-popover-tag">{hovered.kind==='goals'?'MÉDIA':'APROVEITAMENTO'}</span></div>{hovered.kind==='goals'?<><div className="goals-popover-average"><strong>{(hovered.row as GoalsRow).average.toFixed(1)}</strong><span>gols por jogo</span></div><div className="goals-popover-games">{(hovered.row as GoalsRow).games.toLocaleString('pt-BR')} partidas finalizadas</div></>:<><div className="goals-popover-average"><strong>{(hovered.row as ChartPoint).percentage}%</strong><span>dos pontos disputados</span></div><div className="goals-popover-games">{(hovered.row as ChartPoint).played} jogos · {(hovered.row as ChartPoint).won}V {(hovered.row as ChartPoint).drawn}E {(hovered.row as ChartPoint).lost}D</div></>}</div>}
+      {hovered&&typeof document!=='undefined'&&createPortal(<div className={`form-popover goals-popover ${hovered.below?'form-popover-below':''}`} style={{left:hovered.left,top:hovered.below?hovered.top+30:undefined,bottom:hovered.below?undefined:`calc(100vh - ${hovered.top}px + 9px)`}} role="tooltip"><div className="form-popover-heading"><span>TEMPORADA {hovered.row.season}</span><span className="form-popover-result goals-popover-tag">{hovered.kind==='goals'?'MÉDIA':'APROVEITAMENTO'}</span></div>{hovered.kind==='goals'?<><div className="goals-popover-average"><strong>{(hovered.row as GoalsRow).average.toFixed(1)}</strong><span>gols por jogo</span></div><div className="goals-popover-games">{(hovered.row as GoalsRow).games.toLocaleString('pt-BR')} partidas finalizadas</div></>:<><div className="goals-popover-average"><strong>{(hovered.row as ChartPoint).percentage}%</strong><span>dos pontos disputados</span></div><div className="goals-popover-games">{(hovered.row as ChartPoint).played} jogos · {(hovered.row as ChartPoint).won}V {(hovered.row as ChartPoint).drawn}E {(hovered.row as ChartPoint).lost}D</div></>}</div>,document.body)}
     </div>
   </>;
 }

@@ -3,7 +3,7 @@ import Institutional from '../components/Institutional';
 function Section({title,children}:{title:string;children:React.ReactNode}){return <section className="section"><h2>{title}</h2><p className="desc">{children}</p></section>}
 
 export default function Sources(){
-  return <Institutional title="Dados, metodologia e créditos" desc="O que os indicadores do DB.brasileirao representam, como são calculados e quais limites de cobertura considerar.">
+  return <Institutional title="Dados, metodologia e créditos" desc="O que os indicadores do Brasileirão Database representam, como são calculados e quais limites de cobertura considerar.">
     <Section title="Cobertura">O acervo organiza temporadas, partidas, clubes, jogadores, classificações, estatísticas e recordes do Brasileirão Série A. Nem todo campo está disponível em todas as edições; cada página mantém essa distinção em vez de preencher lacunas com valores presumidos.</Section>
     <Section title="Partidas e resultados">Uma partida só compõe cálculos de resultado quando está identificada como finalizada e tem o placar disponível. Jogos agendados, adiados, em andamento ou sem placar confirmado não contam como resultados concluídos.</Section>
     <Section title="Classificação e mando de campo">A classificação total apresenta a campanha da edição. Os recortes Casa e Fora consideram, respectivamente, apenas partidas em que o clube aparece como mandante ou visitante. Pontos, vitórias, empates, derrotas, gols pró, gols contra e saldo seguem os dados disponíveis para aquela temporada.</Section>

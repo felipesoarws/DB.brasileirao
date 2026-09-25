@@ -16,5 +16,5 @@ const geist=localFont({src:'../node_modules/geist/dist/fonts/geist-sans/Geist-Va
 const mono=localFont({src:'../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2',variable:'--font-mono'});
 
 export default function App({Component,pageProps}:AppProps){
-  return <div className={`${geist.className} ${geist.variable} ${mono.variable}`}><Head><meta key="application-name" name="application-name" content="DB.brasileirao"/><link key="favicon" rel="icon" type="image/png" href="/favicon.png?v=20260923"/></Head><AppShell><Component {...pageProps}/></AppShell></div>;
+  return <div className={`${geist.className} ${geist.variable} ${mono.variable}`}><Head><meta key="application-name" name="application-name" content="Brasileirão Database"/><link key="favicon" rel="icon" type="image/png" href="/favicon.png?v=20260923"/></Head><AppShell><Component {...pageProps}/></AppShell></div>;
 }

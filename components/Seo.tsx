@@ -16,7 +16,7 @@ export default function Seo({title,description,path,image='/favicon.png?v=202609
     <meta key="og:description" property="og:description" content={description}/>
     <meta key="og:url" property="og:url" content={canonical}/>
     <meta key="og:image" property="og:image" content={imageUrl}/>
-    <meta key="og:image:alt" property="og:image:alt" content="DB.brasileirao — dados do Campeonato Brasileiro Série A"/>
+    <meta key="og:image:alt" property="og:image:alt" content="Brasileirão Database — dados do Campeonato Brasileiro Série A"/>
     <meta key="twitter:card" name="twitter:card" content="summary_large_image"/>
     <meta key="twitter:title" name="twitter:title" content={title}/>
     <meta key="twitter:description" name="twitter:description" content={description}/>

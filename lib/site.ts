@@ -1,5 +1,5 @@
 export const SITE_URL=(process.env.NEXT_PUBLIC_SITE_URL||'https://brasileirao.felipesoarws.me').replace(/\/+$/,'');
-export const SITE_NAME='DB.brasileirao';
+export const SITE_NAME='Brasileirão Database';
 
 export function absoluteUrl(path:string){
   const pathname=path.startsWith('/')?path:`/${path}`;
