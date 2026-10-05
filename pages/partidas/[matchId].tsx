@@ -16,13 +16,13 @@ type MatchPageProps={match:Row|null;events:MatchEvent[];lineups:LineupTeam[];sta
 
 const statLabels:Record<string,string>={
   possession:'Posse de bola',total_shots:'Finalizações',shots_on_target:'Chutes no gol',shots_off_target:'Finalizações para fora',blockedShots:'Finalizações bloqueadas',shotPct:'Precisão das finalizações',
-  corners:'Escanteios',offsides:'Impedimentos',penaltyKickGoals:'Gols de pênalti',penaltyKickShots:'Pênaltis cobrados',
+  corners:'Escanteios',offsides:'Impedimentos',
   passes:'Passes tentados',accuratePasses:'Passes certos',pass_accuracy:'Precisão dos passes',totalCrosses:'Cruzamentos',accurateCrosses:'Cruzamentos certos',crossPct:'Precisão dos cruzamentos',totalLongBalls:'Bolas longas',accurateLongBalls:'Bolas longas certas',longballPct:'Precisão das bolas longas',
   saves:'Defesas do goleiro',effectiveTackles:'Desarmes certos',totalTackles:'Desarmes tentados',tacklePct:'Precisão dos desarmes',interceptions:'Interceptações',effectiveClearance:'Cortes eficazes',totalClearance:'Cortes',
   fouls:'Faltas cometidas',yellow_cards:'Cartões amarelos',red_cards:'Cartões vermelhos'
 };
 const statCategories=[
-  {key:'attack',label:'Ataque',stats:['total_shots','shots_on_target','shots_off_target','blockedShots','shotPct','penaltyKickGoals','penaltyKickShots','corners','offsides']},
+  {key:'attack',label:'Ataque',stats:['total_shots','shots_on_target','shots_off_target','blockedShots','shotPct','corners','offsides']},
   {key:'possession',label:'Posse e passes',stats:['possession','passes','accuratePasses','pass_accuracy','totalCrosses','accurateCrosses','crossPct','totalLongBalls','accurateLongBalls','longballPct']},
   {key:'defense',label:'Defesa',stats:['saves','effectiveTackles','totalTackles','tacklePct','interceptions','effectiveClearance','totalClearance']},
   {key:'discipline',label:'Disciplina',stats:['fouls','yellow_cards','red_cards']}

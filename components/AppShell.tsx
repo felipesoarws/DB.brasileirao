@@ -5,7 +5,7 @@ import {ReactNode,useEffect,useRef,useState} from 'react';
 type Theme='light'|'dark';
 const nav=[['⌘','Dashboard','/'],['▣','Temporadas','/temporadas'],['♙','Clubes','/clubes'],['○','Partidas','/partidas'],['⇄','Confrontos','/confrontos'],['◷','Linha do tempo','/linha-do-tempo'],['▤','Simulação','/simulacao'],['▥','Recordes','/recordes']];
 
-function BrandMark(){return <span className="mark"><img src="/favicon.png?v=20260923" alt=""/></span>}
+function BrandMark(){return <span className="mark brand-competition-mark" aria-hidden="true"><img className="brand-competition-logo-light" src="/brasileirao_a.png" alt=""/><img className="brand-competition-logo-dark" src="/brasileirao_b.png" alt=""/></span>}
 
 function Menu({close,updated,theme,onToggle}:{close?:()=>void;updated:string;theme:Theme;onToggle:()=>void}){
   const router=useRouter();
