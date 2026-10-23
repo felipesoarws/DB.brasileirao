@@ -2,6 +2,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import Link from './Link';
 import type {Row} from './ui';
 import {StandingsTable,Team} from './ui';
+import {rankStandings} from '../lib/data/standings-ranking';
 
 type Match=Row;
 type Prediction={home:string;away:string};
@@ -106,9 +107,8 @@ function simulatedStandings(table:Row[],matches:Match[],predictions:Predictions)
   }
 
   const ranked:Row[]=[...rows.values()].map(row=>({...row,goal_difference:row.goals_for-row.goals_against,form:(formByTeam.get(String(row.canonical_team_id))||[]).slice(-5).reverse()}));
-  return ranked
-    .sort((a,b)=>b.points-a.points||b.goal_difference-a.goal_difference||b.goals_for-a.goals_for||String(a.team_name||'').localeCompare(String(b.team_name||''),'pt-BR'))
-    .map((row,index)=>({...row,position:index+1}));
+  const rankedMatches=matchesWithScores.map(({match,homeGoals,awayGoals})=>({...match,homeGoals,awayGoals}));
+  return rankStandings(ranked,rankedMatches);
 }
 
 export default function SeasonSimulation({season,matches,table}:{season:string;matches:Match[];table:Row[]}){
@@ -205,6 +205,6 @@ export default function SeasonSimulation({season,matches,table}:{season:string;m
       })}</div>:<div className="empty">Não há partidas nesta rodada para simular.</div>}
     </section>
     </div>
-    <div className="season-simulation-methodology"><button type="button" className="btn season-simulation-clear" onClick={clearPredictions} disabled={Object.keys(predictions).length===0}>Limpar placares</button><p className="season-simulation-footnote">Empates ordenados por pontos, saldo de gols, gols pró e nome do clube. Previsões ficam neste dispositivo até a base publicar o placar oficial.</p></div>
+    <div className="season-simulation-methodology"><button type="button" className="btn season-simulation-clear" onClick={clearPredictions} disabled={Object.keys(predictions).length===0}>Limpar placares</button><p className="season-simulation-footnote">Com pontos iguais: vitórias, saldo, gols pró, confronto direto (se restarem dois clubes), menos cartões vermelhos e amarelos. Empate em todos os critérios é exibido por nome; o regulamento prevê sorteio. Previsões ficam neste dispositivo até a base publicar o placar oficial.</p></div>
   </div>;
 }

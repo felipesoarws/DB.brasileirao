@@ -1,4 +1,5 @@
 import { by, gold, isFinished, latestSeason, Row, teamsMap } from './gold';
+import { rankStandings } from './standings-ranking';
 
 export const matches = () => {
   const clubs=teamsMap();
@@ -31,10 +32,23 @@ export const standings = (s:string) => {
   }
   for(const [id,form] of formByTeam)formByTeam.set(id,form.slice(-5).reverse());
   const saved=by(gold('season_standings'),'season',s);
-  if(saved.length)return saved.sort((a,b)=>(a.position??99)-(b.position??99)).map(r=>{
+  const finishedMatchIds=new Set(formMatches.map(match=>String(match.canonical_match_id)));
+  const discipline=new Map<string,{red_cards:number;yellow_cards:number}>();
+  for(const card of gold('cards')){
+    if(String(card.season)!==s||!finishedMatchIds.has(String(card.canonical_match_id)))continue;
+    const id=String(card.team_id||card.canonical_team_id||''),counts=discipline.get(id)||{red_cards:0,yellow_cards:0};
+    if(String(card.card).toLowerCase()==='red')counts.red_cards++;
+    if(String(card.card).toLowerCase()==='yellow')counts.yellow_cards++;
+    discipline.set(id,counts);
+  }
+  if(saved.length){
+    const rows=saved.map(r=>{
     const id=String(r.canonical_team_id||r.team_id),club=clubs.get(id);
-    return {...r,canonical_team_id:id,team_name:club?.canonical_team_name??club?.name??null,wins:r.wins??r.won,draws:r.draws??r.drawn,losses:r.losses??r.lost,goals_for:r.goals_for??r.gf,goals_against:r.goals_against??r.ga,goal_difference:r.goal_difference??(Number(r.gf)-Number(r.ga)),form:formByTeam.get(id)||[],team:club??null};
-  });
+    return {...r,canonical_team_id:id,team_name:club?.canonical_team_name??club?.name??null,wins:r.wins??r.won,draws:r.draws??r.drawn,losses:r.losses??r.lost,goals_for:r.goals_for??r.gf,goals_against:r.goals_against??r.ga,goal_difference:r.goal_difference??(Number(r.goals_for??r.gf)-Number(r.goals_against??r.ga)),...discipline.get(id),form:formByTeam.get(id)||[],team:club??null};
+    });
+    // Keep published final positions for historical seasons; apply the current regulation to the live season table.
+    return s===latestSeason()?rankStandings(rows,formMatches):rows.sort((a,b)=>Number((a as Row).position??99)-Number((b as Row).position??99));
+  }
 
   const rows=new Map<string,Row>();
   for(const m of seasonMatches(s)){
@@ -48,10 +62,8 @@ export const standings = (s:string) => {
     else{home.draws++;away.draws++;home.points++;away.points++;}
     rows.set(homeId,home);rows.set(awayId,away);
   }
-  const ranked:Row[]=[...rows.values()].map(r=>{const club=clubs.get(r.canonical_team_id);return {...r,goal_difference:r.goals_for-r.goals_against,team_name:club?.canonical_team_name??club?.name??null,form:formByTeam.get(r.canonical_team_id)||[],team:club??null};});
-  return ranked
-    .sort((a,b)=>b.points-a.points||b.goal_difference-a.goal_difference||b.goals_for-a.goals_for||(a.team_name||'').localeCompare(b.team_name||''))
-    .map((r,i)=>({...r,position:i+1}));
+  const ranked:Row[]=[...rows.values()].map(r=>{const club=clubs.get(r.canonical_team_id);return {...r,...discipline.get(r.canonical_team_id),goal_difference:r.goals_for-r.goals_against,team_name:club?.canonical_team_name??club?.name??null,form:formByTeam.get(r.canonical_team_id)||[],team:club??null};});
+  return rankStandings(ranked,formMatches);
 };
 
 export const venueStandings = (s:string,venue:'home'|'away',baseRows:Row[]=standings(s)) => {
@@ -85,9 +97,7 @@ export const venueStandings = (s:string,venue:'home'|'away',baseRows:Row[]=stand
     forms.set(teamId,results);
   }
   const ranked:Row[]=[...rows.entries()].map(([id,row])=>({...row,form:(forms.get(id)||[]).slice(-5).reverse()}));
-  return ranked
-    .sort((a,b)=>b.points-a.points||b.goal_difference-a.goal_difference||b.goals_for-a.goals_for||String(a.team_name||'').localeCompare(String(b.team_name||'')))
-    .map((row,index)=>({...row,position:index+1}));
+  return rankStandings(ranked,[],{headToHead:false,discipline:false});
 };
 
 export function seasonAnalytics(s:string){

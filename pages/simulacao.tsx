@@ -39,6 +39,8 @@ export const getServerSideProps:GetServerSideProps=async()=>{
     goals_for:row.goals_for,
     goals_against:row.goals_against,
     goal_difference:row.goal_difference,
+    red_cards:row.red_cards??0,
+    yellow_cards:row.yellow_cards??0,
     team:row.team?{color:row.team.color??null}:null,
     form:[]
   })):[];
